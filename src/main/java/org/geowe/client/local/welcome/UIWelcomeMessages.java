@@ -28,13 +28,13 @@ import com.google.gwt.i18n.client.Messages;
 public interface UIWelcomeMessages extends Messages {
 	UIWelcomeMessages INSTANCE = GWT.create(UIWelcomeMessages.class);
 
-	String news();
+	String name();
 
 	String text1();
 
 	String text2();
 
-	String helpUs();
+	String forgetPassword();
 
 	String disclaimer();
 
@@ -42,8 +42,6 @@ public interface UIWelcomeMessages extends Messages {
 
 	String TermsOfUse();
 
-	String involved();
-
-	String license();
+	String contact();
 
 }
