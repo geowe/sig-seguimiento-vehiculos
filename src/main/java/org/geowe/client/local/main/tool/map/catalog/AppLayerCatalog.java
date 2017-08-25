@@ -71,12 +71,12 @@ public class AppLayerCatalog extends AbstractLayerCatalog {
 	@PostConstruct
 	private void initializeCatalog() {
 		addLayers(googleLayerSet);
-		addLayers(bingLayerSet);
+		//addLayers(bingLayerSet);
 		addLayers(osmLayerSet);
 		addLayers(esriLayerSet);
 		addLayers(ignLayerSet);
 		addLayers(pnoaWMTSLayerSet);
 		addLayers(miscWmsLayerSet);
-		addLayers(sampleLayeSet);			
+		//addLayers(sampleLayeSet);			
 	}
 }
