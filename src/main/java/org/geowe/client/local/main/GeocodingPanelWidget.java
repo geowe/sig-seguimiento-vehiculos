@@ -255,6 +255,7 @@ public class GeocodingPanelWidget implements IsWidget {
 
 	private TextButton getW3WLocationButton() {
 		final TextButton locationButton = new TextButton();
+		locationButton.setEnabled(false);
 		locationButton.setToolTip(UIMessages.INSTANCE.gcW3WlocationButtonToolTip());
 		locationButton.setIcon(ImageProvider.INSTANCE.w3w24());
 		locationButton.addSelectHandler(new SelectHandler() {

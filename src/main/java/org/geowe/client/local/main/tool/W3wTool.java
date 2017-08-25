@@ -67,6 +67,7 @@ public class W3wTool extends ToggleTool {
 		super(UIMessages.INSTANCE.what3Words(), ImageProvider.INSTANCE.w3w24());
 		setToolTipConfig(createTooltipConfig(UIMessages.INSTANCE.what3Words(),
 				UIMessages.INSTANCE.w3wToolTip(), Side.LEFT));
+		setEnabled(false);
 	}
 
 	@Override

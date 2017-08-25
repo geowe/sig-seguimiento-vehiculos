@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import org.geowe.client.local.ImageProvider;
 import org.geowe.client.local.initializer.URLVectorLayerInitializer;
 import org.geowe.client.local.main.AnchorBuilder;
+import org.geowe.client.local.messages.UIMessages;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -36,11 +37,14 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.sencha.gxt.core.client.XTemplates;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
+import com.sencha.gxt.widget.core.client.form.PasswordField;
+import com.sencha.gxt.widget.core.client.form.TextField;
 
 /**
  * 
@@ -52,6 +56,9 @@ public class Welcome {
 
 	@Inject
 	private URLVectorLayerInitializer uRLVectorLayerInitializer;
+	
+	private TextField userNameField;
+	private PasswordField passwordField;
 
 	public interface WelcomeTemplate extends XTemplates {
 		@XTemplate(source = "welcomeTemplate.html")
@@ -85,12 +92,36 @@ public class Welcome {
 		panel.setSize("520px", "310px");
 		panel.setSpacing(5);
 		panel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		
+		
+
+		panel.add(getAuthenticationPanel());
+		panel.add(data);
+		return panel;
+	}
+	
+	private VerticalPanel getAuthenticationPanel(){
+		final VerticalPanel panel = new VerticalPanel();
+		
+		panel.setWidth("150px");		
+		panel.setSpacing(10);
 		Anchor anchor = new AnchorBuilder().setHref("http://www.geowe.org")
 				.setImage(new Image(ImageProvider.INSTANCE.geoweSquareLogo()))
 				.build();
-
 		panel.add(anchor);
-		panel.add(data);
+		
+		userNameField = new TextField();
+		userNameField.setTitle(UIMessages.INSTANCE.gitHubUserNameField());
+		userNameField.setEmptyText(UIMessages.INSTANCE.gitHubUserNameField());
+		userNameField.setWidth(120);
+		panel.add(userNameField);
+
+		passwordField = new PasswordField();		
+		passwordField.setTitle(UIMessages.INSTANCE.gitHubPasswordField());
+		passwordField.setEmptyText(UIMessages.INSTANCE.gitHubPasswordField());
+		passwordField.setWidth(120);
+		panel.add(passwordField);
+		
 		return panel;
 	}
 
