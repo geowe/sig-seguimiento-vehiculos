@@ -114,12 +114,14 @@ public class Welcome {
 		userNameField.setTitle(UIMessages.INSTANCE.gitHubUserNameField());
 		userNameField.setEmptyText(UIMessages.INSTANCE.gitHubUserNameField());
 		userNameField.setWidth(120);
+		userNameField.setAllowBlank(false);
 		panel.add(userNameField);
 
 		passwordField = new PasswordField();		
 		passwordField.setTitle(UIMessages.INSTANCE.gitHubPasswordField());
 		passwordField.setEmptyText(UIMessages.INSTANCE.gitHubPasswordField());
 		passwordField.setWidth(120);
+		passwordField.setAllowBlank(false);
 		panel.add(passwordField);
 		
 		return panel;
