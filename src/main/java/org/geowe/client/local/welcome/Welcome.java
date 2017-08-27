@@ -29,6 +29,8 @@ import org.geowe.client.local.ImageProvider;
 import org.geowe.client.local.initializer.URLVectorLayerInitializer;
 import org.geowe.client.local.main.AnchorBuilder;
 import org.geowe.client.local.messages.UIMessages;
+import org.geowe.client.local.sgf.SGFLoginServiceProxy;
+import org.slf4j.Logger;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -55,7 +57,11 @@ import com.sencha.gxt.widget.core.client.form.TextField;
 public class Welcome {
 
 	@Inject
+	private Logger logger;
+	@Inject
 	private URLVectorLayerInitializer uRLVectorLayerInitializer;
+	@Inject
+	private SGFLoginServiceProxy sgfLoginServiceProxy;
 	
 	private TextField userNameField;
 	private PasswordField passwordField;
@@ -77,15 +83,23 @@ public class Welcome {
 		simple.setBodyStyleName("pad-text");
 		simple.getBody().addClassName("pad-text");
 		simple.add(getPanel(getHtml()));
-		simple.getButton(PredefinedButton.OK).addSelectHandler(
-				new SelectHandler() {
-					@Override
-					public void onSelect(final SelectEvent event) {
-						uRLVectorLayerInitializer.createLayerFromURL();
-					}
-				});
+		simple.getButton(PredefinedButton.OK).addSelectHandler(new SelectHandler() {
+			@Override
+			public void onSelect(final SelectEvent event) {
+				uRLVectorLayerInitializer.createLayerFromURL();
+				logger.info("ok pressed...");
+				// TODO: comprobar campos (que no sean vacios)
+				String userName = userNameField.getText();
+				String passwd = passwordField.getText();
+				// TODO: montar el payload de una menera menos cutre
+				String payload = "{\"username\":\"" + userName + "\",\"password\": \"" + passwd + "\"}";
+
+				sgfLoginServiceProxy.login(payload);
+			}
+		});
 		simple.show();
 	}
+	
 
 	private HorizontalPanel getPanel(final HTML data) {
 		HorizontalPanel panel = new HorizontalPanel();
