@@ -12,14 +12,12 @@ import org.jboss.errai.enterprise.client.jaxrs.api.RestClient;
 import org.jboss.errai.enterprise.client.jaxrs.api.RestErrorCallback;
 import org.slf4j.Logger;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 
 @ApplicationScoped
 public class SGFLoginServiceProxy {
 	private final static String URL_BASE = "http://localhost:8081";	
-	final String urlBase = GWT.getHostPageBaseURL() + "gwtOpenLayersProxy";
 	@Inject
 	private MessageDialogBuilder messageDialogBuilder;
 	
@@ -29,7 +27,7 @@ public class SGFLoginServiceProxy {
 
 	public void login(String payload){
 		logger.info("Proxy payload:"+payload);
-		RestClient.create(SGFService.class, urlBase+"?"+URL_BASE,
+		RestClient.create(SGFService.class, URL_BASE,
 				getRemoteCallback(), getErrorCallback(), Response.SC_OK)
 				.login(payload);
 	}
@@ -42,18 +40,20 @@ public class SGFLoginServiceProxy {
 			public boolean error(Request request, Throwable throwable) {
 
 				String message = "Not authenticated";
-				int defaultCodeError = Response.SC_NOT_MODIFIED;
+				int defaultCodeError = Response.SC_EXPECTATION_FAILED;
+				logger.info("ERROR: "+defaultCodeError+throwable.getMessage());
 				try {
 					throw throwable;
+					
 				} catch (ResponseException e) {
 					Response response = e.getResponse();
 					message = response.getStatusText();
 					defaultCodeError = response.getStatusCode();
 
 				} catch (Throwable t) {
-					message = t.getMessage();
+					//message = t.getStackTrace().toString();
 				}
-
+				
 				messageDialogBuilder.createError(
 						UIMessages.INSTANCE.warning() + " " + defaultCodeError,
 						message).show();
@@ -70,7 +70,7 @@ public class SGFLoginServiceProxy {
 
 			@Override
 			public void callback(String response) {
-				logger.info(response);
+				logger.info("RESPONSE: "+response);
 				
 				messageDialogBuilder.createInfo(
 						UIMessages.INSTANCE.gitHubResponseTitle(),
