@@ -10,11 +10,11 @@ import javax.ws.rs.Produces;
  * @author lotor
  *
  */
-
+@Path("/")
 public interface SGFService {
 
 	@POST
-	@Path("/login")
+	@Path("login")
 	@Produces("application/json; charset=utf-8")
 	@Consumes("application/json; charset=utf-8")
 	String login(String payload);
