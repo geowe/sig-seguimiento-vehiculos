@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import org.geowe.client.local.messages.UIMessages;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.geowe.client.shared.rest.sgf.SGFService;
+import org.geowe.client.shared.rest.sgf.model.SgfUser;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jboss.errai.enterprise.client.jaxrs.api.ResponseException;
 import org.jboss.errai.enterprise.client.jaxrs.api.RestClient;
@@ -17,19 +18,22 @@ import com.google.gwt.http.client.Response;
 
 @ApplicationScoped
 public class SGFLoginServiceProxy {
+	//TODO: poner url como property
 	private final static String URL_BASE = "http://localhost:8081";	
 	@Inject
 	private MessageDialogBuilder messageDialogBuilder;
 	
 	@Inject
 	private Logger logger;
+	
 
-
+	//TODO: progress bar
 	public void login(String payload){
 		logger.info("Proxy payload:"+payload);
 		RestClient.create(SGFService.class, URL_BASE,
 				getRemoteCallback(), getErrorCallback(), Response.SC_OK)
 				.login(payload);
+		
 	}
 	
 	//TODO: mejorar mensaje de error
@@ -63,21 +67,23 @@ public class SGFLoginServiceProxy {
 		};
 	}
 
-	//TODO: La respuesta será un objeto Usuario. Por ahora para probar
+	
 	//TODO: Se necesita recoger la cabecera Authorization para el token JWT
-	private RemoteCallback<String> getRemoteCallback() {
-		return new RemoteCallback<String>() {
+	//a ver si se puede con un interceptor (implementado  listo para probar)
+	private RemoteCallback<SgfUser> getRemoteCallback() {
+		return new RemoteCallback<SgfUser>() {
 
 			@Override
-			public void callback(String response) {
-				logger.info("RESPONSE: "+response);
+			public void callback(SgfUser response) {
+				logger.info("RESPONSE: "+response.toString());
 				
 				messageDialogBuilder.createInfo(
-						UIMessages.INSTANCE.gitHubResponseTitle(),
-						response)
+						response.getName(),
+						response.getUsername())
 						.show();
 			}
 
 		};
 	}
+	
 }
