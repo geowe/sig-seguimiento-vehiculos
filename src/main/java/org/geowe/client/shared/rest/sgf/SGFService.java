@@ -5,6 +5,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.geowe.client.shared.rest.sgf.model.SgfUser;
+import org.jboss.errai.common.client.api.interceptor.InterceptedCall;
+
 /**
  * 
  * @author lotor
@@ -17,5 +20,6 @@ public interface SGFService {
 	@Path("login")
 	@Produces("application/json; charset=utf-8")
 	@Consumes("application/json; charset=utf-8")
-	String login(String payload);
+	@InterceptedCall(LoginInterceptor.class)
+	SgfUser login(String payload);
 }
