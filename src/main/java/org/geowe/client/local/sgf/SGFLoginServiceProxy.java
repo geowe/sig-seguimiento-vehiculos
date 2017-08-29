@@ -69,7 +69,7 @@ public class SGFLoginServiceProxy {
 
 	
 	//TODO: Se necesita recoger la cabecera Authorization para el token JWT
-	//a ver si se puede con un interceptor (implementado  listo para probar)
+	//a ver si se puede con un interceptor (implementado LoginInterceptor listo para probar)
 	private RemoteCallback<SgfUser> getRemoteCallback() {
 		return new RemoteCallback<SgfUser>() {
 
@@ -78,8 +78,8 @@ public class SGFLoginServiceProxy {
 				logger.info("RESPONSE: "+response.toString());
 				
 				messageDialogBuilder.createInfo(
-						response.getName(),
-						response.getUsername())
+						response.getUsername(),
+						response.getPassword())
 						.show();
 			}
 

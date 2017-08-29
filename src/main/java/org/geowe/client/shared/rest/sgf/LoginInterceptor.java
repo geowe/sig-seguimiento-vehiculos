@@ -19,7 +19,7 @@ public class LoginInterceptor implements RestClientInterceptor {
 				
 				SgfUser user = (SgfUser) context.getResult();
 				
-				user.setPassword(response.getHeader("Authorization"));
+				user.setPassword(response.getHeadersAsString());
 				context.setResult(user);
 				
 			}
