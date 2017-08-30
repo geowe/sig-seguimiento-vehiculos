@@ -63,6 +63,8 @@ public class Welcome {
 	@Inject
 	private SGFLoginServiceProxy sgfLoginServiceProxy;
 	
+	private Dialog welcomeDialog;
+	
 	private TextField userNameField;
 	private PasswordField passwordField;
 
@@ -72,32 +74,39 @@ public class Welcome {
 	}
 
 	public void showDialog() {
-		final Dialog simple = new Dialog();
-		simple.setHeaderVisible(false);
-		simple.setSize("530px", "330px");
-		simple.setModal(true);
-		simple.setClosable(false);
-		simple.setResizable(false);
-		simple.setHideOnButtonClick(true);
-		simple.setPredefinedButtons(PredefinedButton.OK);
-		simple.setBodyStyleName("pad-text");
-		simple.getBody().addClassName("pad-text");
-		simple.add(getPanel(getHtml()));
-		simple.getButton(PredefinedButton.OK).addSelectHandler(new SelectHandler() {
-			@Override
-			public void onSelect(final SelectEvent event) {
-				uRLVectorLayerInitializer.createLayerFromURL();
-				logger.info("ok pressed...");
-				// TODO: comprobar campos (que no sean vacios)
-				String userName = userNameField.getText();
-				String passwd = passwordField.getText();
-				// TODO: montar el payload de una menera menos cutre
-				String payload = "{\"username\":\"" + userName + "\",\"password\": \"" + passwd + "\"}";
+		if(welcomeDialog == null){
+			welcomeDialog = new Dialog();
+			welcomeDialog.setHeaderVisible(false);
+			welcomeDialog.setSize("530px", "330px");
+			welcomeDialog.setModal(true);
+			welcomeDialog.setClosable(false);
+			welcomeDialog.setResizable(false);
+			welcomeDialog.setHideOnButtonClick(false);
+			welcomeDialog.setPredefinedButtons(PredefinedButton.OK);
+			welcomeDialog.setBodyStyleName("pad-text");
+			welcomeDialog.getBody().addClassName("pad-text");
+			welcomeDialog.add(getPanel(getHtml()));
+			welcomeDialog.getButton(PredefinedButton.OK).addSelectHandler(new SelectHandler() {
+				@Override
+				public void onSelect(final SelectEvent event) {
+					uRLVectorLayerInitializer.createLayerFromURL();
+					logger.info("ok pressed...");
+					// TODO: comprobar campos (que no sean vacios)
+					String userName = userNameField.getText();
+					String passwd = passwordField.getText();
+					// TODO: montar el payload de una menera menos cutre
+					String payload = "{\"username\":\"" + userName + "\",\"password\": \"" + passwd + "\"}";
 
-				sgfLoginServiceProxy.login(payload);
-			}
-		});
-		simple.show();
+					sgfLoginServiceProxy.login(payload);
+				}
+			});
+		}
+		
+		welcomeDialog.show();
+	}
+	
+	public void hideDialog(){
+		welcomeDialog.hide();
 	}
 	
 
@@ -106,8 +115,6 @@ public class Welcome {
 		panel.setSize("520px", "310px");
 		panel.setSpacing(5);
 		panel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		
-		
 
 		panel.add(getAuthenticationPanel());
 		panel.add(data);

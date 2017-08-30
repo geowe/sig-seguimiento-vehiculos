@@ -5,6 +5,7 @@ import javax.inject.Inject;
 
 import org.geowe.client.local.messages.UIMessages;
 import org.geowe.client.local.ui.MessageDialogBuilder;
+import org.geowe.client.local.welcome.Welcome;
 import org.geowe.client.shared.rest.sgf.SGFService;
 import org.geowe.client.shared.rest.sgf.model.SgfUser;
 import org.jboss.errai.common.client.api.RemoteCallback;
@@ -26,10 +27,11 @@ public class SGFLoginServiceProxy {
 	@Inject
 	private Logger logger;
 	
+	@Inject
+	private Welcome welcome;
 
 	//TODO: progress bar
 	public void login(String payload){
-		logger.info("Proxy payload:"+payload);
 		RestClient.create(SGFService.class, URL_BASE,
 				getRemoteCallback(), getErrorCallback(), Response.SC_OK)
 				.login(payload);
@@ -57,7 +59,7 @@ public class SGFLoginServiceProxy {
 				} catch (Throwable t) {
 					//message = t.getStackTrace().toString();
 				}
-				
+
 				messageDialogBuilder.createError(
 						UIMessages.INSTANCE.warning() + " " + defaultCodeError,
 						message).show();
@@ -75,11 +77,13 @@ public class SGFLoginServiceProxy {
 
 			@Override
 			public void callback(SgfUser response) {
+				welcome.hideDialog();
+				
 				logger.info("RESPONSE: "+response.toString());
 				
 				messageDialogBuilder.createInfo(
 						response.getUsername(),
-						response.getPassword())
+						response.getName())
 						.show();
 			}
 

@@ -5,6 +5,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.geowe.client.local.sgf.LoginInterceptor;
 import org.geowe.client.shared.rest.sgf.model.SgfUser;
 import org.jboss.errai.common.client.api.interceptor.InterceptedCall;
 
