@@ -62,11 +62,12 @@ public class Welcome {
 	private URLVectorLayerInitializer uRLVectorLayerInitializer;
 	@Inject
 	private SGFLoginServiceProxy sgfLoginServiceProxy;
-	
+
 	private Dialog welcomeDialog;
-	
+
 	private TextField userNameField;
 	private PasswordField passwordField;
+	private Image progressImage;
 
 	public interface WelcomeTemplate extends XTemplates {
 		@XTemplate(source = "welcomeTemplate.html")
@@ -74,7 +75,7 @@ public class Welcome {
 	}
 
 	public void showDialog() {
-		if(welcomeDialog == null){
+		if (welcomeDialog == null) {
 			welcomeDialog = new Dialog();
 			welcomeDialog.setHeaderVisible(false);
 			welcomeDialog.setSize("530px", "330px");
@@ -86,29 +87,29 @@ public class Welcome {
 			welcomeDialog.setBodyStyleName("pad-text");
 			welcomeDialog.getBody().addClassName("pad-text");
 			welcomeDialog.add(getPanel(getHtml()));
-			welcomeDialog.getButton(PredefinedButton.OK).addSelectHandler(new SelectHandler() {
-				@Override
-				public void onSelect(final SelectEvent event) {
-					uRLVectorLayerInitializer.createLayerFromURL();
-					logger.info("ok pressed...");
-					// TODO: comprobar campos (que no sean vacios)
-					String userName = userNameField.getText();
-					String passwd = passwordField.getText();
-					// TODO: montar el payload de una menera menos cutre
-					String payload = "{\"username\":\"" + userName + "\",\"password\": \"" + passwd + "\"}";
+			welcomeDialog.getButton(PredefinedButton.OK).addSelectHandler(
+					new SelectHandler() {
+						@Override
+						public void onSelect(final SelectEvent event) {
+							uRLVectorLayerInitializer.createLayerFromURL();
+							logger.info("ok pressed...");
+							progressImage.setVisible(true);
+							// TODO: comprobar campos (que no sean vacios)
+							String userName = userNameField.getText();
+							String passwd = passwordField.getText();
 
-					sgfLoginServiceProxy.login(payload);
-				}
-			});
+							sgfLoginServiceProxy.login(userName, passwd);
+						}
+					});
 		}
-		
+
 		welcomeDialog.show();
 	}
-	
-	public void hideDialog(){
+
+	public void hideDialog() {
+		progressImage.setVisible(false);
 		welcomeDialog.hide();
 	}
-	
 
 	private HorizontalPanel getPanel(final HTML data) {
 		HorizontalPanel panel = new HorizontalPanel();
@@ -120,17 +121,17 @@ public class Welcome {
 		panel.add(data);
 		return panel;
 	}
-	
-	private VerticalPanel getAuthenticationPanel(){
+
+	private VerticalPanel getAuthenticationPanel() {
 		final VerticalPanel panel = new VerticalPanel();
-		
-		panel.setWidth("150px");		
+
+		panel.setWidth("150px");
 		panel.setSpacing(10);
 		Anchor anchor = new AnchorBuilder().setHref("http://www.geowe.org")
 				.setImage(new Image(ImageProvider.INSTANCE.geoweSquareLogo()))
 				.build();
 		panel.add(anchor);
-		
+
 		userNameField = new TextField();
 		userNameField.setTitle(UIMessages.INSTANCE.gitHubUserNameField());
 		userNameField.setEmptyText(UIMessages.INSTANCE.gitHubUserNameField());
@@ -138,13 +139,16 @@ public class Welcome {
 		userNameField.setAllowBlank(false);
 		panel.add(userNameField);
 
-		passwordField = new PasswordField();		
+		passwordField = new PasswordField();
 		passwordField.setTitle(UIMessages.INSTANCE.gitHubPasswordField());
 		passwordField.setEmptyText(UIMessages.INSTANCE.gitHubPasswordField());
 		passwordField.setWidth(120);
 		passwordField.setAllowBlank(false);
 		panel.add(passwordField);
-		
+
+		progressImage = new Image(ImageProvider.INSTANCE.circleProgress());
+		progressImage.setVisible(false);
+		panel.add(progressImage);
 		return panel;
 	}
 
@@ -152,5 +156,9 @@ public class Welcome {
 		WelcomeTemplate template = GWT.create(WelcomeTemplate.class);
 
 		return new HTML(template.renderTemplate(UIWelcomeMessages.INSTANCE));
+	}
+
+	public void hideProgressImage() {
+		this.progressImage.setVisible(false);
 	}
 }

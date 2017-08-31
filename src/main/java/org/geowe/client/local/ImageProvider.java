@@ -381,4 +381,7 @@ public interface ImageProvider extends ClientBundle {
 	
 	@Source("images/ic_blue_pin_icon.png")
 	ImageResource mapPointIcon();
+	
+	@Source("images/ic_circle_progress-24.gif")
+	ImageResource circleProgress();
 }

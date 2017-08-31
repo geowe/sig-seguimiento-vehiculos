@@ -3,91 +3,49 @@ package org.geowe.client.local.sgf;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.geowe.client.local.messages.UIMessages;
+import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.geowe.client.local.welcome.Welcome;
 import org.geowe.client.shared.rest.sgf.SGFService;
-import org.geowe.client.shared.rest.sgf.model.SgfUser;
-import org.jboss.errai.common.client.api.RemoteCallback;
-import org.jboss.errai.enterprise.client.jaxrs.api.ResponseException;
-import org.jboss.errai.enterprise.client.jaxrs.api.RestClient;
-import org.jboss.errai.enterprise.client.jaxrs.api.RestErrorCallback;
-import org.slf4j.Logger;
+import org.geowe.client.shared.rest.sgf.SGFServiceAsync;
 
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+/**
+ * 
+ * @author lotor
+ *
+ */
 @ApplicationScoped
 public class SGFLoginServiceProxy {
-	//TODO: poner url como property
-	private final static String URL_BASE = "http://localhost:8081";	
+
 	@Inject
 	private MessageDialogBuilder messageDialogBuilder;
-	
-	@Inject
-	private Logger logger;
-	
+
+
 	@Inject
 	private Welcome welcome;
 
-	//TODO: progress bar
-	public void login(String payload){
-		RestClient.create(SGFService.class, URL_BASE,
-				getRemoteCallback(), getErrorCallback(), Response.SC_OK)
-				.login(payload);
+	private final SGFServiceAsync sgfServiceAsync = GWT.create(SGFService.class);
+
+	public void login(String userName, String password) {
 		
-	}
-	
-	//TODO: mejorar mensaje de error
-	private RestErrorCallback getErrorCallback() {
-		return new RestErrorCallback() {
+		sgfServiceAsync.login(userName, password, new AsyncCallback<String>() {
 
 			@Override
-			public boolean error(Request request, Throwable throwable) {
-
-				String message = "Not authenticated";
-				int defaultCodeError = Response.SC_EXPECTATION_FAILED;
-				logger.info("ERROR: "+defaultCodeError+throwable.getMessage());
-				try {
-					throw throwable;
-					
-				} catch (ResponseException e) {
-					Response response = e.getResponse();
-					message = response.getStatusText();
-					defaultCodeError = response.getStatusCode();
-
-				} catch (Throwable t) {
-					//message = t.getStackTrace().toString();
-				}
-
-				messageDialogBuilder.createError(
-						UIMessages.INSTANCE.warning() + " " + defaultCodeError,
-						message).show();
-
-				return false;
+			public void onFailure(Throwable caught) {
+				messageDialogBuilder.createError("Error",
+						UISgfMessages.INSTANCE.authError()).show();
+				welcome.hideProgressImage();
 			}
-		};
-	}
-
-	
-	//TODO: Se necesita recoger la cabecera Authorization para el token JWT
-	//a ver si se puede con un interceptor (implementado LoginInterceptor listo para probar)
-	private RemoteCallback<SgfUser> getRemoteCallback() {
-		return new RemoteCallback<SgfUser>() {
 
 			@Override
-			public void callback(SgfUser response) {
+			public void onSuccess(String result) {
 				welcome.hideDialog();
-				
-				logger.info("RESPONSE: "+response.toString());
-				
-				messageDialogBuilder.createInfo(
-						response.getUsername(),
-						response.getName())
-						.show();
-			}
+				messageDialogBuilder.createInfo("SUCCESS", result).show();;
 
-		};
+			}
+		});
 	}
-	
+
 }

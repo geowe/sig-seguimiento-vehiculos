@@ -35,6 +35,16 @@
 		<servlet-name>w3wServlet</servlet-name>
 		<url-pattern>/app/w3wService</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>sgfServlet</servlet-name>
+		<servlet-class>org.geowe.server.sgf.SGFServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>sgfServlet</servlet-name>
+		<url-pattern>/app/sgfService</url-pattern>
+	</servlet-mapping>
 
  <!-- REST service -->  
 <!--     <context-param>   -->
