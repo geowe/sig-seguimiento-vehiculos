@@ -42,7 +42,7 @@ public class RegisteredPoint {
 	/*
 	 * Punto en WKT
 	 */
-	private String positionWkt;
+	private String position;
 
 	public String getImei() {
 		return imei;
@@ -77,11 +77,11 @@ public class RegisteredPoint {
 	}
 
 	public String getPositionWkt() {
-		return positionWkt;
+		return position;
 	}
 
 	public void setPositionWkt(String positionWkt) {
-		this.positionWkt = positionWkt;
+		this.position = positionWkt;
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class RegisteredPoint {
 		result = prime * result + Arrays.hashCode(date);
 		result = prime * result + ((imei == null) ? 0 : imei.hashCode());
 		result = prime * result
-				+ ((positionWkt == null) ? 0 : positionWkt.hashCode());
+				+ ((position == null) ? 0 : position.hashCode());
 		return result;
 	}
 
@@ -111,10 +111,10 @@ public class RegisteredPoint {
 				return false;
 		} else if (!imei.equals(other.imei))
 			return false;
-		if (positionWkt == null) {
-			if (other.positionWkt != null)
+		if (position == null) {
+			if (other.position != null)
 				return false;
-		} else if (!positionWkt.equals(other.positionWkt))
+		} else if (!position.equals(other.position))
 			return false;
 		return true;
 	}
@@ -123,7 +123,7 @@ public class RegisteredPoint {
 	public String toString() {
 		return "RegisteredPoint [imei=" + imei + ", date="
 				+ Arrays.toString(date) + ", speed=" + speed + ", datos="
-				+ datos + ", positionWkt=" + positionWkt + "]";
+				+ datos + ", positionWkt=" + position + "]";
 	}
 
 }
