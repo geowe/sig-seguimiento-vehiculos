@@ -30,6 +30,8 @@ public class SgfUser {
 	
 	private SgfCompany company;
 
+	private String token;
+
 	public String getName() {
 		return name;
 	}
@@ -108,6 +110,14 @@ public class SgfUser {
 
 	public void setCompany(SgfCompany company) {
 		this.company = company;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 	@Override

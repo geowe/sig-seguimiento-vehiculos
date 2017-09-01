@@ -1,25 +1,15 @@
 package org.geowe.client.shared.rest.sgf;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-
-import org.geowe.client.shared.rest.sgf.model.SgfUser;
-import org.jboss.errai.common.client.api.interceptor.InterceptedCall;
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 /**
  * 
  * @author lotor
  *
  */
-@Path("/")
-public interface SGFService {
+@RemoteServiceRelativePath("sgfService")
+public interface SGFService extends RemoteService {
 
-	@POST
-	@Path("login")
-	@Produces("application/json; charset=utf-8")
-	@Consumes("application/json; charset=utf-8")
-	@InterceptedCall(LoginInterceptor.class)
-	SgfUser login(String payload);
+	String login(String user, String password) throws IllegalArgumentException;;
 }
