@@ -38,14 +38,12 @@ public interface SampleLayerDataProvider extends ClientBundle {
 
 	public SampleLayerDataProvider INSTANCE = GWT
 			.create(SampleLayerDataProvider.class);
-
-	@Source("data/andalucia.kml")
-	TextResource andaluciaLayerKml();
-	
-	@Source("data/manzanas.kml")
-	TextResource manzanasLayerKml();
-
-	@Source("data/humedales.kml")
-	TextResource humedalesLayerKml();
+	/*
+	 * @Source("data/andalucia.kml") TextResource andaluciaLayerKml();
+	 * 
+	 * @Source("data/manzanas.kml") TextResource manzanasLayerKml();
+	 * 
+	 * @Source("data/humedales.kml") TextResource humedalesLayerKml();
+	 */
 	
 }
