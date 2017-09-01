@@ -5,17 +5,17 @@ import org.jboss.errai.common.client.api.annotations.MapsTo;
 import org.jboss.errai.common.client.api.annotations.Portable;
 
 @Portable
-public class RegisteredPointPage {
+public class RegisteredPointResponse implements PageableResponse<RegisteredPoint>{
 
 	private RegisteredPointPageContent content;
 
-	private Page page;
+	private PageInfo pageInfo;
 
-	public RegisteredPointPage(@MapsTo("_embedded") RegisteredPointPageContent content,
-			@MapsTo("page") Page page) {
+	public RegisteredPointResponse(@MapsTo("_embedded") RegisteredPointPageContent content,
+			@MapsTo("page") PageInfo pageInfo) {
 		super();
 		this.content = content;
-		this.page = page;
+		this.pageInfo = pageInfo;
 	}
 
 	public PageContent<RegisteredPoint> getContent() {
@@ -26,17 +26,17 @@ public class RegisteredPointPage {
 		this.content = content;
 	}
 
-	public Page getPage() {
-		return page;
+	public PageInfo getPageInfo() {
+		return pageInfo;
 	}
 
-	public void setPage(Page page) {
-		this.page = page;
+	public void setPageInfo(PageInfo page) {
+		this.pageInfo = page;
 	}
 
 	@Override
 	public String toString() {
-		return "RegisteredPointPage [content=" + content + ", page=" + page + "]";
+		return "RegisteredPointPage [content=" + content + ", page=" + pageInfo + "]";
 	}
 
 }

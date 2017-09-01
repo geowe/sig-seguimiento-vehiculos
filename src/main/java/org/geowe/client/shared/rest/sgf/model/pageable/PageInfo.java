@@ -3,7 +3,7 @@ package org.geowe.client.shared.rest.sgf.model.pageable;
 import org.jboss.errai.common.client.api.annotations.Portable;
 
 @Portable
-public class Page {
+public class PageInfo {
 	
 	private int size;
 	

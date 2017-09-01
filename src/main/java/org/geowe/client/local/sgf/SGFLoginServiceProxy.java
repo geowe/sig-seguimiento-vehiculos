@@ -10,7 +10,7 @@ import org.geowe.client.shared.rest.sgf.SGFRegisteredPointService;
 import org.geowe.client.shared.rest.sgf.SGFService;
 import org.geowe.client.shared.rest.sgf.SGFServiceAsync;
 import org.geowe.client.shared.rest.sgf.model.RegisteredPoint;
-import org.geowe.client.shared.rest.sgf.model.pageable.RegisteredPointPage;
+import org.geowe.client.shared.rest.sgf.model.pageable.RegisteredPointResponse;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jboss.errai.enterprise.client.jaxrs.api.RestClient;
 import org.jboss.errai.enterprise.client.jaxrs.api.RestErrorCallback;
@@ -65,10 +65,10 @@ public class SGFLoginServiceProxy {
 	// TODO: TEST
 	private void getRegisteredPoints() {
 		RestClient.create(SGFRegisteredPointService.class, "http://127.0.0.1:8081",
-				new RemoteCallback<RegisteredPointPage>() {
+				new RemoteCallback<RegisteredPointResponse>() {
 
 					@Override
-					public void callback(RegisteredPointPage response) {
+					public void callback(RegisteredPointResponse response) {
 						
 						for(RegisteredPoint point : response.getContent().getResourceList()){
 							logger.info(point.toString());
