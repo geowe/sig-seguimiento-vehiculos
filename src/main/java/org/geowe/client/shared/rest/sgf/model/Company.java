@@ -9,7 +9,7 @@ import org.jboss.errai.common.client.api.annotations.Portable;
  *
  */
 @Portable
-public class SgfCompany {
+public class Company {
 	
 	private int id;
 
@@ -99,7 +99,7 @@ public class SgfCompany {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SgfCompany other = (SgfCompany) obj;
+		Company other = (Company) obj;
 		if (cif == null) {
 			if (other.cif != null)
 				return false;

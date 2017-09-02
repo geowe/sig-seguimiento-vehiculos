@@ -7,7 +7,7 @@ import org.jboss.errai.common.client.api.annotations.Portable;
  * 
  */
 @Portable
-public class SgfUser {
+public class User {
 
 	private int id;
 
@@ -31,7 +31,7 @@ public class SgfUser {
 
 	private String token;
 
-	private SgfCompany company;
+	private Company company;
 
 	public int getId() {
 		return id;
@@ -113,11 +113,11 @@ public class SgfUser {
 		this.email = email;
 	}
 
-	public SgfCompany getCompany() {
+	public Company getCompany() {
 		return company;
 	}
 
-	public void setCompany(SgfCompany company) {
+	public void setCompany(Company company) {
 		this.company = company;
 	}
 
@@ -148,7 +148,7 @@ public class SgfUser {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SgfUser other = (SgfUser) obj;
+		User other = (User) obj;
 		if (email == null) {
 			if (other.email != null)
 				return false;
