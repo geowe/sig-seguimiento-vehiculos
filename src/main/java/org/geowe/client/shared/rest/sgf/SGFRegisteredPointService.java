@@ -6,20 +6,19 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
-import org.geowe.client.shared.rest.sgf.model.pageable.RegisteredPointResponse;
+import org.geowe.client.shared.rest.sgf.model.pageable.registeredpoint.RegisteredPointResponse;
 
 /**
  * Servicio que expone la API de Puntos Registrados por los GPS
- * 
- * @author lotor
- *
+ * TODO: pediente de que estén disponibles todos los recursos
+ * @author lotor 
  */
 @Path("/registeredpoints")
 public interface SGFRegisteredPointService {
 
-	@GET	
+	
+	@GET
 	@Consumes("application/json")
-	RegisteredPointResponse getAll(@HeaderParam("Authorization") String authorization,
-			@QueryParam("size")int size,
-			@QueryParam("sort")String sort);
+	RegisteredPointResponse getAll(@HeaderParam("Authorization") String authorization, @QueryParam("size") int size,
+			@QueryParam("sort") String sort);
 }

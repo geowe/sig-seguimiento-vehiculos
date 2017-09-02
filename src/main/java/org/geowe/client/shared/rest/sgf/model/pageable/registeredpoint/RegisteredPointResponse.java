@@ -1,21 +1,23 @@
-package org.geowe.client.shared.rest.sgf.model.pageable;
+package org.geowe.client.shared.rest.sgf.model.pageable.registeredpoint;
 
 import org.geowe.client.shared.rest.sgf.model.RegisteredPoint;
+import org.geowe.client.shared.rest.sgf.model.pageable.PageContent;
+import org.geowe.client.shared.rest.sgf.model.pageable.PageInfo;
+import org.geowe.client.shared.rest.sgf.model.pageable.PageableResponse;
+import org.geowe.client.shared.rest.sgf.model.pageable.PagedResponse;
 import org.jboss.errai.common.client.api.annotations.MapsTo;
 import org.jboss.errai.common.client.api.annotations.Portable;
 
 @Portable
-public class RegisteredPointResponse implements PageableResponse<RegisteredPoint>{
+public class RegisteredPointResponse extends PagedResponse implements PageableResponse<RegisteredPoint>{
 
 	private RegisteredPointPageContent content;
 
-	private PageInfo pageInfo;
 
 	public RegisteredPointResponse(@MapsTo("_embedded") RegisteredPointPageContent content,
 			@MapsTo("page") PageInfo pageInfo) {
-		super();
+		super(pageInfo);
 		this.content = content;
-		this.pageInfo = pageInfo;
 	}
 
 	public PageContent<RegisteredPoint> getContent() {
@@ -25,18 +27,11 @@ public class RegisteredPointResponse implements PageableResponse<RegisteredPoint
 	public void setContent(RegisteredPointPageContent content) {
 		this.content = content;
 	}
-
-	public PageInfo getPageInfo() {
-		return pageInfo;
-	}
-
-	public void setPageInfo(PageInfo page) {
-		this.pageInfo = page;
-	}
+	
 
 	@Override
 	public String toString() {
-		return "RegisteredPointPage [content=" + content + ", page=" + pageInfo + "]";
+		return "RegisteredPointPage [content=" + content + ", page=" + getPageInfo() + "]";
 	}
 
 }

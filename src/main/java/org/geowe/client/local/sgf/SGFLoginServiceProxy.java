@@ -6,11 +6,11 @@ import javax.inject.Inject;
 import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.geowe.client.local.welcome.Welcome;
-import org.geowe.client.shared.rest.sgf.SGFRegisteredPointService;
+import org.geowe.client.shared.rest.sgf.SGFCompanyService;
 import org.geowe.client.shared.rest.sgf.SGFService;
 import org.geowe.client.shared.rest.sgf.SGFServiceAsync;
-import org.geowe.client.shared.rest.sgf.model.RegisteredPoint;
-import org.geowe.client.shared.rest.sgf.model.pageable.RegisteredPointResponse;
+import org.geowe.client.shared.rest.sgf.model.Company;
+import org.geowe.client.shared.rest.sgf.model.pageable.company.CompanyResponse;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jboss.errai.enterprise.client.jaxrs.api.RestClient;
 import org.jboss.errai.enterprise.client.jaxrs.api.RestErrorCallback;
@@ -64,13 +64,13 @@ public class SGFLoginServiceProxy {
 
 	// TODO: TEST
 	private void getRegisteredPoints() {
-		RestClient.create(SGFRegisteredPointService.class, "http://127.0.0.1:8081",
-				new RemoteCallback<RegisteredPointResponse>() {
+		RestClient.create(SGFCompanyService.class, "http://127.0.0.1:8081",
+				new RemoteCallback<CompanyResponse>() {
 
 					@Override
-					public void callback(RegisteredPointResponse response) {
+					public void callback(CompanyResponse response) {
 						
-						for(RegisteredPoint point : response.getContent().getResourceList()){
+						for(Company point : response.getContent().getResourceList()){
 							logger.info(point.toString());
 						}
 						messageDialogBuilder
@@ -90,7 +90,7 @@ public class SGFLoginServiceProxy {
 						return false;
 					}
 				}, Response.SC_OK)
-				.getAll("Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiAxIiwiZXhwIjoxNTA1MTY1OTQwfQ.5S63d0Yltd3l8AUnK4_nibbBONoFpeTQJzp-UrFNYp64hm4TpnGUjvNYkeX3qe77wYzv092UJNy3_WXyPhnpUw",
+				.get("Bearer  eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiAxIiwiZXhwIjoxNTA1MjA5OTE3fQ.QLnlVDrqt9pAmAlCIDNIyulepnxZB9qd7q5RVZQFTj-hbZN_wkMjxHg_kM6uBmAoab9tybXpBw8vcCRV0rPQ5w",
 						10, "id");
 
 	}
