@@ -2,13 +2,14 @@ package org.geowe.client.shared.rest.sgf.model;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
 
-
 /**
  * Representa un usuario del Sistema de Seguimiento de Flotas
  * 
  */
 @Portable
-public class SgfUser {
+public class User {
+
+	private int id;
 
 	private String name;
 
@@ -27,10 +28,18 @@ public class SgfUser {
 	private String phone;
 
 	private String email;
-	
-	private SgfCompany company;
 
 	private String token;
+
+	private Company company;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;
@@ -103,12 +112,12 @@ public class SgfUser {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
-	public SgfCompany getCompany() {
+
+	public Company getCompany() {
 		return company;
 	}
 
-	public void setCompany(SgfCompany company) {
+	public void setCompany(Company company) {
 		this.company = company;
 	}
 
@@ -125,45 +134,44 @@ public class SgfUser {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
-		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		result = prime * result + id;
+		result = prime * result
+				+ ((username == null) ? 0 : username.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
+		if (this == obj)
 			return true;
-		}
-		if (obj == null) {
+		if (obj == null)
 			return false;
-		}
-		if (getClass() != obj.getClass()) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
-		SgfUser other = (SgfUser) obj;
+		User other = (User) obj;
 		if (email == null) {
-			if (other.email != null) {
+			if (other.email != null)
 				return false;
-			}
-		} else if (!email.equals(other.email)) {
+		} else if (!email.equals(other.email))
 			return false;
-		}
+		if (id != other.id)
+			return false;
 		if (username == null) {
-			if (other.username != null) {
+			if (other.username != null)
 				return false;
-			}
-		} else if (!username.equals(other.username)) {
+		} else if (!username.equals(other.username))
 			return false;
-		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "SgfUser [name=" + name + ", firstSurname=" + firstSurname + ", secondSurname=" + secondSurname
-				+ ", username=" + username + ", password=" + password + ", status=" + status + ", role=" + role
-				+ ", phone=" + phone + ", email=" + email + ", company=" + company + "]";
+		return "SgfUser [id=" + id + ", name=" + name + ", firstSurname="
+				+ firstSurname + ", secondSurname=" + secondSurname
+				+ ", username=" + username + ", password=" + password
+				+ ", status=" + status + ", role=" + role + ", phone=" + phone
+				+ ", email=" + email + ", token=" + token + ", company="
+				+ company + "]";
 	}
 
-	
 }
