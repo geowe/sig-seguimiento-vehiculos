@@ -21,7 +21,7 @@ import org.jboss.errai.common.client.api.annotations.Portable;
 @Portable
 public class RegisteredPoint {
 
-
+	
 	private String imei;
 
 	/*
@@ -43,7 +43,7 @@ public class RegisteredPoint {
 	 * Punto en WKT
 	 */
 	private String position;
-
+	
 	public String getImei() {
 		return imei;
 	}
@@ -84,14 +84,31 @@ public class RegisteredPoint {
 		this.position = positionWkt;
 	}
 
+	public String getDateAsString() {
+		String dateAsString = "";
+		if (this.date != null && this.date.length >= 3) {
+			dateAsString = this.date[0] + "-" + this.date[1] + "-" + this.date[2];
+		}
+		return dateAsString;
+	}
+
+	public String getTimeAsString() {
+		StringBuilder time = new StringBuilder("");
+		if (this.date != null && this.date.length > 3) {
+			for (int i = 3; i < date.length; i++) {
+				time.append(date[i] + ":");
+			}
+		}
+		return time.toString();
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + Arrays.hashCode(date);
 		result = prime * result + ((imei == null) ? 0 : imei.hashCode());
-		result = prime * result
-				+ ((position == null) ? 0 : position.hashCode());
+		result = prime * result + ((position == null) ? 0 : position.hashCode());
 		return result;
 	}
 
@@ -121,8 +138,7 @@ public class RegisteredPoint {
 
 	@Override
 	public String toString() {
-		return "RegisteredPoint [imei=" + imei + ", date="
-				+ Arrays.toString(date) + ", speed=" + speed + ", datos="
+		return "RegisteredPoint [imei=" + imei + ", date=" + Arrays.toString(date) + ", speed=" + speed + ", datos="
 				+ datos + ", positionWkt=" + position + "]";
 	}
 

@@ -55,7 +55,7 @@ public class SGFLoginServiceProxy {
 				welcome.hideDialog();
 				messageDialogBuilder.createInfo("SUCCESS", result).show();
 
-				getRegisteredPoints();
+				getCompanies();
 
 			}
 
@@ -63,7 +63,7 @@ public class SGFLoginServiceProxy {
 	}
 
 	// TODO: TEST
-	private void getRegisteredPoints() {
+	private void getCompanies() {
 		RestClient.create(SGFCompanyService.class, "http://127.0.0.1:8081",
 				new RemoteCallback<CompanyResponse>() {
 
