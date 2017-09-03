@@ -1,10 +1,10 @@
 package org.geowe.client.shared.rest.sgf.model.pageable.vehicle;
 
-import org.geowe.client.shared.rest.sgf.model.Vehicle;
 import org.geowe.client.shared.rest.sgf.model.pageable.PageContent;
 import org.geowe.client.shared.rest.sgf.model.pageable.PageInfo;
 import org.geowe.client.shared.rest.sgf.model.pageable.PageableResponse;
 import org.geowe.client.shared.rest.sgf.model.pageable.PagedResponse;
+import org.geowe.client.shared.rest.sgf.model.vehicle.Vehicle;
 import org.jboss.errai.common.client.api.annotations.MapsTo;
 
 public class VehicleResponse extends PagedResponse implements PageableResponse<Vehicle>{

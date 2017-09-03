@@ -1,4 +1,4 @@
-package org.geowe.client.shared.rest.sgf.model;
+package org.geowe.client.shared.rest.sgf.model.vehicle;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
 

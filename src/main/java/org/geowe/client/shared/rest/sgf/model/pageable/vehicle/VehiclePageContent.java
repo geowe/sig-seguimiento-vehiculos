@@ -2,8 +2,8 @@ package org.geowe.client.shared.rest.sgf.model.pageable.vehicle;
 
 import java.util.Set;
 
-import org.geowe.client.shared.rest.sgf.model.Vehicle;
 import org.geowe.client.shared.rest.sgf.model.pageable.PageContent;
+import org.geowe.client.shared.rest.sgf.model.vehicle.Vehicle;
 import org.jboss.errai.common.client.api.annotations.MapsTo;
 import org.jboss.errai.common.client.api.annotations.Portable;
 

@@ -7,8 +7,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
-import org.geowe.client.shared.rest.sgf.model.Vehicle;
 import org.geowe.client.shared.rest.sgf.model.pageable.company.CompanyResponse;
+import org.geowe.client.shared.rest.sgf.model.vehicle.Vehicle;
 
 /**
  * Servicio que expone la API de Empresas
