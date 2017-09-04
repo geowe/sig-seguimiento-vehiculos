@@ -41,41 +41,45 @@ import org.geowe.client.local.messages.UICatalogMessages;
 public class SampleLayerSet extends AbstractLayerSet {
 	
 	public SampleLayerSet() {
-		final SampleFileVectorLayerDef andaluciaLayer = new SampleFileVectorLayerDef();
-		andaluciaLayer.setName(UICatalogMessages.INSTANCE
-				.andalusianProvincesName());
-		andaluciaLayer.setDescription(UICatalogMessages.INSTANCE
-				.andalusianProvincesDescription());
-		andaluciaLayer.setFormat(VectorLayerDef.KML);
-		andaluciaLayer.setFile(SampleLayerDataProvider.INSTANCE
-				.andaluciaLayerKml());
-		andaluciaLayer.setIcon(ImageProvider.INSTANCE.layer16());
-		andaluciaLayer.setEpsg("EPSG:25830");		
-
-		final SampleFileVectorLayerDef blockLayer = new SampleFileVectorLayerDef();
-		blockLayer.setName(UICatalogMessages.INSTANCE.lebrijaBlocksName());
-		blockLayer.setDescription(UICatalogMessages.INSTANCE
-				.lebrijaBlocksDescription());
-		blockLayer.setFormat(VectorLayerDef.KML);
-		blockLayer.setFile(SampleLayerDataProvider.INSTANCE
-				.manzanasLayerKml());
-		blockLayer.setIcon(ImageProvider.INSTANCE.layer16());
-		blockLayer.setEpsg("EPSG:25830");		
-
-		final SampleFileVectorLayerDef wetlandLayer = new SampleFileVectorLayerDef();
-		wetlandLayer.setName(UICatalogMessages.INSTANCE
-				.andalusianWetlandsName());
-		wetlandLayer.setDescription(UICatalogMessages.INSTANCE
-				.andalusianWetlandsDescription());
-		wetlandLayer.setFormat(VectorLayerDef.KML);
-		wetlandLayer.setFile(SampleLayerDataProvider.INSTANCE
-				.humedalesLayerKml());
-		wetlandLayer.setIcon(ImageProvider.INSTANCE.layer16());
-		wetlandLayer.setEpsg("EPSG:25830");		
-		
-		layers.add(andaluciaLayer);
-		layers.add(blockLayer);
-		layers.add(wetlandLayer);		
+		/*
+		 * final SampleFileVectorLayerDef andaluciaLayer = new
+		 * SampleFileVectorLayerDef();
+		 * andaluciaLayer.setName(UICatalogMessages.INSTANCE
+		 * .andalusianProvincesName());
+		 * andaluciaLayer.setDescription(UICatalogMessages.INSTANCE
+		 * .andalusianProvincesDescription());
+		 * andaluciaLayer.setFormat(VectorLayerDef.KML);
+		 * andaluciaLayer.setFile(SampleLayerDataProvider.INSTANCE
+		 * .andaluciaLayerKml());
+		 * andaluciaLayer.setIcon(ImageProvider.INSTANCE.layer16());
+		 * andaluciaLayer.setEpsg("EPSG:25830");
+		 * 
+		 * final SampleFileVectorLayerDef blockLayer = new
+		 * SampleFileVectorLayerDef();
+		 * blockLayer.setName(UICatalogMessages.INSTANCE.lebrijaBlocksName());
+		 * blockLayer.setDescription(UICatalogMessages.INSTANCE
+		 * .lebrijaBlocksDescription());
+		 * blockLayer.setFormat(VectorLayerDef.KML);
+		 * blockLayer.setFile(SampleLayerDataProvider.INSTANCE
+		 * .manzanasLayerKml());
+		 * blockLayer.setIcon(ImageProvider.INSTANCE.layer16());
+		 * blockLayer.setEpsg("EPSG:25830");
+		 * 
+		 * final SampleFileVectorLayerDef wetlandLayer = new
+		 * SampleFileVectorLayerDef();
+		 * wetlandLayer.setName(UICatalogMessages.INSTANCE
+		 * .andalusianWetlandsName());
+		 * wetlandLayer.setDescription(UICatalogMessages.INSTANCE
+		 * .andalusianWetlandsDescription());
+		 * wetlandLayer.setFormat(VectorLayerDef.KML);
+		 * wetlandLayer.setFile(SampleLayerDataProvider.INSTANCE
+		 * .humedalesLayerKml());
+		 * wetlandLayer.setIcon(ImageProvider.INSTANCE.layer16());
+		 * wetlandLayer.setEpsg("EPSG:25830");
+		 * 
+		 * layers.add(andaluciaLayer); layers.add(blockLayer);
+		 * layers.add(wetlandLayer);
+		 */		
 	}
 
 }
