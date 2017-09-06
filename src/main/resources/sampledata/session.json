@@ -1,0 +1,22 @@
+{
+  "id": 3,
+  "name": "Test platform admin 1",
+  "firstSurname": "Test platform admin 1",
+  "secondSurname": null,
+  "username": "admin 1",  
+  "status": "ACTIVE",
+  "role": "PLATFORM_ADMIN",
+  "token": "Bearer  eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiAxIiwiZXhwIjoxNTA1NDYyMTkzfQ.s27ukXwzbttB_G6kkaHBA0024I7MO8N6aicD4RooLORBXnSdovZswF6I6EHTM75GDPEiOa1rF0I5XcrN4_ULJA",
+  "company": {
+    "id": 1,
+    "resourceId": 1,
+    "cif": "C11576417",
+    "name": "Test Company 1",
+    "postalCode": null,
+    "email": null,
+    "web": null,    
+    "address": null
+  },
+  "phone": null,
+  "email": null
+}

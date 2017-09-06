@@ -5,6 +5,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import org.geowe.client.shared.rest.sgf.model.pageable.vehicle.VehicleResponse;
@@ -16,7 +17,7 @@ import org.geowe.client.shared.rest.sgf.model.vehicle.Vehicle;
  * @author rltorres
  *
  */
-
+@Path("/")
 public interface SGFVehicleService {
 	
 	/**
@@ -29,7 +30,7 @@ public interface SGFVehicleService {
 	 */
 	@GET	
 	@Consumes("application/json")
-	@Path("/vehicles")
+	@Path("vehicles")
 	VehicleResponse get(@HeaderParam("Authorization") String authorization,
 			@QueryParam("size")int size,
 			@QueryParam("sort")String sort);
@@ -40,12 +41,13 @@ public interface SGFVehicleService {
 	 * @param companyId: identificado de la empresa
 	 * @param size: nº de elementos devueltos en cada página
 	 * @param sort: atributo por el que se ordenan los elementos
-	 * @return
+	 * @return cadena em formato JSON de los vehículos de la compañia companyId
 	 */
 	@GET	
 	@Consumes("application/json")
-	@Path("/companies/{companyId}/vehicles")
-	VehicleResponse get(@HeaderParam("Authorization") String authorization,
+	@Produces("application/json")
+	@Path("companies/{companyId}/vehicles")
+	String get(@HeaderParam("Authorization") String authorization,
 			@PathParam("companyId") int companyId,
 			@QueryParam("size")int size,
 			@QueryParam("sort")String sort);
@@ -58,7 +60,7 @@ public interface SGFVehicleService {
 	 */
 	@GET
 	@Consumes("application/json")
-	@Path("/vehicles/{id}")
+	@Path("vehicles/{id}")
 	Vehicle get(@HeaderParam("Authorization") String authorization,
 			@PathParam("id") int id);
 
