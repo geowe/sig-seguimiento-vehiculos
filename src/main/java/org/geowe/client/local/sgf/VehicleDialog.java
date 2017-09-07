@@ -61,6 +61,7 @@ import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
+import com.sencha.gxt.widget.core.client.form.DateField;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
@@ -123,10 +124,14 @@ public class VehicleDialog extends Dialog {
 	private Widget createPanel() {
 
 		VerticalPanel vPanel = new VerticalPanel();
-		vPanel.setPixelSize(490, 420);
-		//vPanel.setSpacing(5);
-		vPanel.add(createTopPanel());
+		//vPanel.setPixelSize(490, 420);
+		vPanel.setPixelSize(490, 90);
+		vPanel.setSpacing(5);
+		
+		//vPanel.add(createTopPanel());
+		vPanel.add(createCompanyPanel());
 		vPanel.add(createBottomPanel());
+		
 
 		return vPanel;
 	}
@@ -135,16 +140,8 @@ public class VehicleDialog extends Dialog {
 		
 		HorizontalLayoutContainer hPanel = new HorizontalLayoutContainer();
 
-		VerticalPanel infoPanel = new VerticalPanel();
-		//infoPanel.setPixelSize(490, 120);
+		VerticalPanel infoPanel = new VerticalPanel();		
 		infoPanel.setSpacing(5);
-
-//		companyNameField = new TextField();
-//		companyNameField.setEnabled(false);
-//		companyNameField.setWidth(FIELD_WIDTH);
-//		infoPanel.add(new Label("Compañía"));
-//		infoPanel.add(companyNameField);
-
 
 		infoPanel.add(createCompanyPanel());
 		//infoPanel.add(createSearchButtonPanel());
@@ -165,6 +162,21 @@ public class VehicleDialog extends Dialog {
 		
 		return hPanel;
 	}
+	//https://docs.sencha.com/gxt/4.x/guides/ui/fields/DateField.html
+//	private void testGxtDialog() {
+//	    Button testButton = new Button("Test Gxt Dialog");
+//	    testButton.addClickHandler(new ClickHandler() {
+//	      @Override
+//	      public void onClick(ClickEvent event) {
+//	        DateField field = new DateField();
+//
+//	        final Dialog box = new Dialog();
+//	        box.setHeadingText("Test");
+//	        box.add(field);
+//	        box.setModal(true);
+//	        box.show();
+//	      }
+//	    });
 	
 //	private VerticalPanel getAttrCombo() {
 //		VerticalPanel vPanel = new VerticalPanel();
@@ -178,7 +190,7 @@ public class VehicleDialog extends Dialog {
 	
 	private VerticalPanel getCompanyNamePanel() {
 		VerticalPanel vPanel = new VerticalPanel();
-		//vPanel.setSpacing(5);
+		vPanel.setSpacing(5);
 		companyNameField = new TextField();
 		companyNameField.setEnabled(false);
 		companyNameField.setWidth(FIELD_WIDTH);
@@ -191,7 +203,7 @@ public class VehicleDialog extends Dialog {
 
 	private VerticalPanel getCompanyCifPanel() {
 		VerticalPanel vPanel = new VerticalPanel();
-		//vPanel.setSpacing(5);
+		vPanel.setSpacing(5);
 		companyCifField = new TextField();
 		companyCifField.setEnabled(false);
 		companyCifField.setWidth(FIELD_WIDTH);
@@ -217,164 +229,12 @@ public class VehicleDialog extends Dialog {
 		gridContainer.add(vehiculeGrid, new VerticalLayoutData(1, 1));
 				
 		hPanel.add(gridContainer);
-		
-		
 
-//		PagingToolBar toolBar = new PagingToolBar(FEATURES_PER_PAGE);
-//		toolBar.setBorders(false);
-//
-//		featureGrid = new PagingFeatureGrid(toolBar);
-//		featureGrid.getSelectionModel().addSelectionChangedHandler(
-//				new SelectionChangedHandler<VectorFeature>() {
-//					@Override
-//					public void onSelectionChanged(
-//							SelectionChangedEvent<VectorFeature> event) {
-//						//setSelectedElements();
-//					}
-//				});
-//
-//		VerticalLayoutContainer gridContainer = new VerticalLayoutContainer();
-//		gridContainer.setWidth(500);
-//		gridContainer.setHeight(220);
-//		gridContainer.add(featureGrid, new VerticalLayoutData(1, 1));
-//		gridContainer.add(toolBar, new VerticalLayoutData(1, -1));
-//
-//		
-//		hPanel.add(gridContainer);
 		//hPanel.add(layerSearchToolBar);
 		return hPanel;
 	}
 
-//	private HorizontalPanel createSearchButtonPanel() {
-//		HorizontalPanel hPanel = new HorizontalPanel();
-//		hPanel.setSpacing(10);
-//		searchButton = getSearchMenuButton();
-//		hPanel.add(searchButton);
-//
-//		isCaseSensitive = new CheckBox();
-//		isCaseSensitive.setBoxLabel(UIMessages.INSTANCE.caseSensitive());
-//		isCaseSensitive.setValue(true);
-//		hPanel.add(isCaseSensitive);
-//		return hPanel;
-//	}
 
-//	private TextButton getSearchMenuButton() {
-//		TextButton searchButton = new TextButton(
-//				UIMessages.INSTANCE.asdSearchButtonText());
-//		searchButton.setMenu(getSearchMenu());
-//		return searchButton;
-//	}
-//
-//	private Menu getSearchMenu() {
-//		Menu menu = new Menu();
-//		menu.add(new MenuItem(UIMessages.INSTANCE.exactEqual(),
-//				new SelectionHandler<MenuItem>() {
-//					@Override
-//					public void onSelection(SelectionEvent<MenuItem> event) {
-//						search(new EqualSearcher());
-//					}
-//				}));
-//
-//		menu.add(new MenuItem(UIMessages.INSTANCE.contains(),
-//				new SelectionHandler<MenuItem>() {
-//					@Override
-//					public void onSelection(SelectionEvent<MenuItem> event) {
-//						search(new ContainSearcher());
-//					}
-//				}));
-//
-//		menu.add(new MenuItem(UIMessages.INSTANCE.startsWith(),
-//				new SelectionHandler<MenuItem>() {
-//					@Override
-//					public void onSelection(SelectionEvent<MenuItem> event) {
-//						search(new StartSearcher());
-//					}
-//				}));
-//
-//		menu.add(new MenuItem(UIMessages.INSTANCE.endsWith(),
-//				new SelectionHandler<MenuItem>() {
-//					@Override
-//					public void onSelection(SelectionEvent<MenuItem> event) {
-//						search(new EndSearcher());
-//					}
-//				}));
-//		menu.add(new MenuItem(UIMessages.INSTANCE.greater(),
-//				new SelectionHandler<MenuItem>() {
-//					@Override
-//					public void onSelection(SelectionEvent<MenuItem> event) {
-//						search(new GreaterThanSearcher());
-//					}
-//				}));
-//		menu.add(new MenuItem(UIMessages.INSTANCE.smaller(),
-//				new SelectionHandler<MenuItem>() {
-//					@Override
-//					public void onSelection(SelectionEvent<MenuItem> event) {
-//						search(new SmallerThanSearcher());
-//					}
-//				}));
-//
-//		return menu;
-//	}
-
-//	private void initializeAttributeLabelCombo(String width) {
-//		ListStore<FeatureAttributeDef> attributeLabelStore = new ListStore<FeatureAttributeDef>(
-//				new ModelKeyProvider<FeatureAttributeDef>() {
-//					@Override
-//					public String getKey(FeatureAttributeDef item) {
-//						return (item == null) ? null : item.getName();
-//					}
-//
-//				});
-//
-//		attributeCombo = new ComboBox<FeatureAttributeDef>(attributeLabelStore,
-//				new LabelProvider<FeatureAttributeDef>() {
-//					@Override
-//					public String getLabel(FeatureAttributeDef item) {
-//						return (item == null) ? null : item.getName();
-//					}
-//				});
-//
-//		attributeCombo.setWidth(width);
-//		attributeCombo.setTypeAhead(true);
-//		attributeCombo.setEmptyText(UIMessages.INSTANCE
-//				.asdAttributeComboEmptyText());
-//		attributeCombo.setTriggerAction(TriggerAction.ALL);
-//		attributeCombo.setForceSelection(true);
-//		attributeCombo.setEditable(false);
-//		attributeCombo.enableEvents();
-//	}
-//
-//	private void search(Searcher searcher) {
-//		String attributeName = attributeCombo.getValue().getName();
-//		String attributeValue = valueAttributeField.getValue();
-//		List<VectorFeature> filteredFeatures = null;
-//		try {
-//			List<VectorFeature> features = Arrays.asList(selectedLayer
-//					.getFeatures());
-//
-//			filteredFeatures = searcher.search(features, attributeValue,
-//					attributeName, isCaseSensitive.getValue());
-//
-//		} catch (Exception e) {
-//			messageDialogBuilder.createError(UIMessages.INSTANCE.warning(),
-//					e.getMessage());
-//			logger.error(e.getMessage());
-//		}
-//
-//		featureGrid.update(filteredFeatures);
-//	}
-
-//	public void setSelectedLayer(VectorLayer layer) {
-//		selectedLayer = layer;
-//		layerNameField.setText(selectedLayer.getName());
-//
-//		// Initilize the featureGrid for the new layer
-//		featureGrid.rebuild(getFeatures(layer));
-//		featureGrid.clear();
-//		updateLayerAttributes();
-//
-//		valueAttributeField.clear();
-//	}
 	
 	public void setVehicle(List<VehicleJSO> vehicles) {
 		vehicleStore.clear();
@@ -388,54 +248,7 @@ public class VehicleDialog extends Dialog {
 	}
 
 	
-//	private void updateLayerAttributes() {
-//		try {
-//			attributeCombo.getStore().clear();
-//			attributeCombo.setEmptyText(UIMessages.INSTANCE
-//					.asdAttributeComboEmptyText());
-//			if (selectedLayer != null && selectedLayer.getAttributes() != null) {
-//				attributeCombo.getStore().addAll(selectedLayer.getAttributes());
-//			}
-//		} catch (Exception e) {
-//			logger.error(
-//					"Error reloading label atribute combo: " + e.getMessage(),
-//					e);
-//		}
-//	}
 
-//	private void setSelectedElements() {
-//		List<VectorFeature> selectedElements = featureGrid.getSelectionModel()
-//				.getSelectedItems();
-//
-//		if (selectedElements == null || selectedElements.isEmpty()) {
-//			Info.display(UIMessages.INSTANCE.warning(),
-//					UIMessages.INSTANCE.selectAtLeast(1));
-//		} else {
-//			for (FeatureTool tool : layerSearchToolBar.getTools()) {
-//				setSelectedElement(selectedElements, tool);
-//			}
-//		}
-//	}
-
-//	private void setSelectedElement(List<VectorFeature> selectedElements,
-//			FeatureTool tool) {
-//		tool.setSelectedLayer(selectedLayer);
-//
-//		if (selectedElements.size() > 1) {
-//			tool.setSelectedFeatures(selectedElements);
-//		} else {
-//			tool.setSelectedFeature(selectedElements.get(0));
-//		}
-//	}
-//
-//	private void addKeyShortcuts() {
-//		KeyShortcutHandler keyShortcut = new KeyShortcutHandler(searchButton,
-//				KeyCodes.KEY_ENTER);
-//
-//		layerNameField.addKeyDownHandler(keyShortcut);
-//		valueAttributeField.addKeyDownHandler(keyShortcut);
-//		attributeCombo.addKeyDownHandler(keyShortcut);
-//	}
 	
 	private Grid<VehicleJSO> createGrid(ListStore<VehicleJSO> dataStore,
 			VehicleJSOProperties properties) {
@@ -490,12 +303,6 @@ public class VehicleDialog extends Dialog {
 				props.lastRevisionDate(), 200, SafeHtmlUtils.fromTrustedString("<b>"
 						+ "Última revisión" + "</b>"));
 		lastRevisionDateColumn.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);	
-		
-//		ColumnConfig<LayerDef, String> typeColumn = new ColumnConfig<LayerDef, String>(
-//				props.type(), 75, UICatalogMessages.INSTANCE.type());
-//		typeColumn.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-//		typeColumn.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);		
-		
 		
 				
 		List<ColumnConfig<VehicleJSO, ?>> columns = new ArrayList<ColumnConfig<VehicleJSO, ?>>();
