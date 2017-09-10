@@ -30,23 +30,16 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.geowe.client.local.ImageProvider;
-import org.geowe.client.local.main.tool.map.catalog.dialog.LayerDefProperties;
-import org.geowe.client.local.main.tool.map.catalog.model.LayerDef;
+import org.geowe.client.local.main.tool.search.LayerSearchToolBar;
 import org.geowe.client.local.messages.UICatalogMessages;
-import org.geowe.client.local.messages.UIMessages;
-import org.geowe.client.local.model.vector.VectorLayer;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.geowe.client.local.ui.PagingFeatureGrid;
 import org.geowe.client.shared.rest.sgf.model.jso.CompanyJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.VehicleJSO;
-import org.gwtopenmaps.openlayers.client.feature.VectorFeature;
 import org.slf4j.Logger;
 
 import com.google.gwt.cell.client.AbstractCell;
-import com.google.gwt.cell.client.ImageResourceCell;
-import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -61,15 +54,11 @@ import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
-import com.sencha.gxt.widget.core.client.form.DateField;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.RowExpander;
-import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent;
-import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent.SelectionChangedHandler;
-import com.sencha.gxt.widget.core.client.toolbar.PagingToolBar;
 
 /**
  * Diálogo para la búsqueda de elementos, por atributo, de la capa seleccionada
@@ -83,8 +72,8 @@ public class VehicleDialog extends Dialog {
 	private static final String FIELD_WIDTH = "225px";
 	@Inject
 	private Logger logger;
-//	@Inject
-//	private LayerSearchToolBar layerSearchToolBar;
+	@Inject
+	private LayerSearchToolBar layerSearchToolBar;
 	@Inject
 	private MessageDialogBuilder messageDialogBuilder;
 
@@ -124,32 +113,34 @@ public class VehicleDialog extends Dialog {
 	private Widget createPanel() {
 
 		VerticalPanel vPanel = new VerticalPanel();
-		//vPanel.setPixelSize(490, 420);
-		vPanel.setPixelSize(490, 90);
+		vPanel.setPixelSize(490, 420);
+		//vPanel.setPixelSize(490, 90);
 		vPanel.setSpacing(5);
 		
 		//vPanel.add(createTopPanel());
 		vPanel.add(createCompanyPanel());
 		vPanel.add(createBottomPanel());
 		
+		
+		
 
 		return vPanel;
 	}
 
-	private HorizontalLayoutContainer createTopPanel() {
-		
-		HorizontalLayoutContainer hPanel = new HorizontalLayoutContainer();
-
-		VerticalPanel infoPanel = new VerticalPanel();		
-		infoPanel.setSpacing(5);
-
-		infoPanel.add(createCompanyPanel());
-		//infoPanel.add(createSearchButtonPanel());
-
-		hPanel.add(infoPanel);
-
-		return hPanel;
-	}
+//	private HorizontalLayoutContainer createTopPanel() {
+//		
+//		HorizontalLayoutContainer hPanel = new HorizontalLayoutContainer();
+//
+//		VerticalPanel infoPanel = new VerticalPanel();		
+//		infoPanel.setSpacing(5);
+//
+//		infoPanel.add(createCompanyPanel());
+////		infoPanel.add(createSearchButtonPanel());
+//
+//		hPanel.add(infoPanel);
+//
+//		return hPanel;
+//	}
 	
 	private HorizontalPanel createCompanyPanel(){
 		HorizontalPanel hPanel = new HorizontalPanel();
@@ -214,9 +205,10 @@ public class VehicleDialog extends Dialog {
 		
 	}
 
-	private HorizontalLayoutContainer createBottomPanel() {
-		HorizontalLayoutContainer hPanel = new HorizontalLayoutContainer();
-		hPanel.setSize("510px", "380px");//"220px"
+	private HorizontalPanel createBottomPanel() {
+//		HorizontalLayoutContainer hPanel = new HorizontalLayoutContainer();
+		HorizontalPanel hPanel = new HorizontalPanel();
+		hPanel.setSize("510px", "220px");//"380px"
 		
 		vehicleStore = new ListStore<VehicleJSO>(vehicleProps.key());
 		Grid<VehicleJSO> vehiculeGrid = createGrid(vehicleStore, vehicleProps);
@@ -225,12 +217,12 @@ public class VehicleDialog extends Dialog {
 
 		VerticalLayoutContainer gridContainer = new VerticalLayoutContainer();
 		gridContainer.setWidth(500);
-		gridContainer.setHeight(380);
+		gridContainer.setHeight(220);
 		gridContainer.add(vehiculeGrid, new VerticalLayoutData(1, 1));
 				
 		hPanel.add(gridContainer);
 
-		//hPanel.add(layerSearchToolBar);
+		hPanel.add(layerSearchToolBar);
 		return hPanel;
 	}
 
