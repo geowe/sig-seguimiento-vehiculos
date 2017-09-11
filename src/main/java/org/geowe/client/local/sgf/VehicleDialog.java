@@ -30,12 +30,12 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.geowe.client.local.ImageProvider;
-import org.geowe.client.local.main.tool.search.LayerSearchToolBar;
 import org.geowe.client.local.messages.UICatalogMessages;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.geowe.client.local.ui.PagingFeatureGrid;
 import org.geowe.client.shared.rest.sgf.model.jso.CompanyJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.VehicleJSO;
+import org.gwtopenmaps.openlayers.client.feature.VectorFeature;
 import org.slf4j.Logger;
 
 import com.google.gwt.cell.client.AbstractCell;
@@ -51,7 +51,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.resources.ThemeStyles;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.Dialog;
-import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.form.TextField;
@@ -59,6 +58,8 @@ import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.RowExpander;
+import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent;
+import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent.SelectionChangedHandler;
 
 /**
  * Diálogo para la búsqueda de elementos, por atributo, de la capa seleccionada
@@ -73,7 +74,7 @@ public class VehicleDialog extends Dialog {
 	@Inject
 	private Logger logger;
 	@Inject
-	private LayerSearchToolBar layerSearchToolBar;
+	private VehicleToolBar vehicleToolBar;
 	@Inject
 	private MessageDialogBuilder messageDialogBuilder;
 
@@ -119,7 +120,7 @@ public class VehicleDialog extends Dialog {
 		
 		//vPanel.add(createTopPanel());
 		vPanel.add(createCompanyPanel());
-		vPanel.add(createBottomPanel());
+		vPanel.add(createGridPanel());
 		
 		
 		
@@ -127,20 +128,6 @@ public class VehicleDialog extends Dialog {
 		return vPanel;
 	}
 
-//	private HorizontalLayoutContainer createTopPanel() {
-//		
-//		HorizontalLayoutContainer hPanel = new HorizontalLayoutContainer();
-//
-//		VerticalPanel infoPanel = new VerticalPanel();		
-//		infoPanel.setSpacing(5);
-//
-//		infoPanel.add(createCompanyPanel());
-////		infoPanel.add(createSearchButtonPanel());
-//
-//		hPanel.add(infoPanel);
-//
-//		return hPanel;
-//	}
 	
 	private HorizontalPanel createCompanyPanel(){
 		HorizontalPanel hPanel = new HorizontalPanel();
@@ -153,31 +140,7 @@ public class VehicleDialog extends Dialog {
 		
 		return hPanel;
 	}
-	//https://docs.sencha.com/gxt/4.x/guides/ui/fields/DateField.html
-//	private void testGxtDialog() {
-//	    Button testButton = new Button("Test Gxt Dialog");
-//	    testButton.addClickHandler(new ClickHandler() {
-//	      @Override
-//	      public void onClick(ClickEvent event) {
-//	        DateField field = new DateField();
-//
-//	        final Dialog box = new Dialog();
-//	        box.setHeadingText("Test");
-//	        box.add(field);
-//	        box.setModal(true);
-//	        box.show();
-//	      }
-//	    });
 	
-//	private VerticalPanel getAttrCombo() {
-//		VerticalPanel vPanel = new VerticalPanel();
-//		vPanel.setSpacing(5);
-//		vPanel.add(new Label(UIMessages.INSTANCE.asdAttributeLabel()));
-//		initializeAttributeLabelCombo(FIELD_WIDTH);
-//		vPanel.add(attributeCombo);
-//
-//		return vPanel;
-//	}
 	
 	private VerticalPanel getCompanyNamePanel() {
 		VerticalPanel vPanel = new VerticalPanel();
@@ -205,24 +168,32 @@ public class VehicleDialog extends Dialog {
 		
 	}
 
-	private HorizontalPanel createBottomPanel() {
+	private HorizontalPanel createGridPanel() {
 //		HorizontalLayoutContainer hPanel = new HorizontalLayoutContainer();
 		HorizontalPanel hPanel = new HorizontalPanel();
-		hPanel.setSize("510px", "220px");//"380px"
+		hPanel.setSize("510px", "320px");//"220px"
 		
 		vehicleStore = new ListStore<VehicleJSO>(vehicleProps.key());
 		Grid<VehicleJSO> vehiculeGrid = createGrid(vehicleStore, vehicleProps);
 		
-		
+		vehiculeGrid.getSelectionModel().addSelectionChangedHandler(
+				new SelectionChangedHandler<VehicleJSO>() {
+					@Override
+					public void onSelectionChanged(
+							SelectionChangedEvent<VehicleJSO> event) {
+						VehicleJSO selected = event.getSelection().get(0);
+						vehicleToolBar.setVehicleJSO(selected);
+					}
+				});
 
 		VerticalLayoutContainer gridContainer = new VerticalLayoutContainer();
 		gridContainer.setWidth(500);
-		gridContainer.setHeight(220);
+		gridContainer.setHeight(320);
 		gridContainer.add(vehiculeGrid, new VerticalLayoutData(1, 1));
 				
 		hPanel.add(gridContainer);
 
-		hPanel.add(layerSearchToolBar);
+		hPanel.add(vehicleToolBar);
 		return hPanel;
 	}
 
