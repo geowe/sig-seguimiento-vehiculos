@@ -61,6 +61,15 @@ import com.sencha.gxt.widget.core.client.form.DateField;
  */
 @ApplicationScoped
 public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
+	private static final String IMEI = "IMEI";
+	private static final String DATE = "FECHA";
+	private static final String TIME = "HORA";
+	private static final String SPEED = "VELOCIDAD";
+	private static final String DATA = "DATOS";
+	private static final String POSITION = "POSICION";
+	private static final String LENGTH = "LONGITUD";
+	
+	
 	private DateField field = new DateField();
 	private VehicleJSO vehicleJSO;
 	
@@ -99,7 +108,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 					new SelectHandler() {
 						@Override
 						public void onSelect(final SelectEvent event) {
-							messageDialogBuilder.createInfo("Atención", "fecha: " + field.getText()).show();
+							
 							
 							VectorLayerConfig layerConfig = null;
 							VectorLayer routeLayer = null;
@@ -110,13 +119,13 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 								layerConfig.setLayerName("Route_" + vehicleJSO.getPlate());								
 								
 								routeLayer = VectorLayerFactory.createEmptyVectorLayer(layerConfig);								
-								routeLayer.addAttribute("IMEI", false);
-								routeLayer.addAttribute("FECHA", false);
-								routeLayer.addAttribute("HORA", false);
-								routeLayer.addAttribute("VELOCIDAD", false);
-								routeLayer.addAttribute("DATOS", false);
-								routeLayer.addAttribute("POSICION", false);
-								
+								routeLayer.addAttribute(IMEI, false);
+								routeLayer.addAttribute(DATE, false);
+								routeLayer.addAttribute(TIME, false);
+								routeLayer.addAttribute(SPEED, false);
+								routeLayer.addAttribute(DATA, false);
+								routeLayer.addAttribute(POSITION, false);
+								routeLayer.addAttribute(LENGTH, false);
 
 //								layer = VectorLayerFactory.createVectorLayerFromGeoData(layerConfig);
 
@@ -125,31 +134,50 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 								messageDialogBuilder.createInfo("Error", e.getMessage()).show();
 							}
 
+							//29085257
+							//39213844
+							String plate = "";
+							
+							if("29085257".equals(vehicleJSO.getPlate())) {
+								plate = SampleDataProvider.INSTANCE.list20RegisterPoint().getText();
+							}
+							else if("39213844".equals(vehicleJSO.getPlate())) {
+								plate = SampleDataProvider.INSTANCE.list500RegisterPoint().getText();
+							}
 							
 							
 							
 							
-							PointRegisterListResponseJSO pointRegisterResponse = JsonUtils.safeEval(SampleDataProvider.INSTANCE.listRegisterPoint().getText());							
+							PointRegisterListResponseJSO pointRegisterResponse = JsonUtils.safeEval(plate);							
 							PointRegisterJSO[] pointRegisters = pointRegisterResponse.getPointRegisterListEmbededJSO().getPointRegister();							
 							List<PointRegisterJSO> points = Arrays.asList(pointRegisters);
 							
+							if(points.size() == 0) {
+								messageDialogBuilder.createInfo("Atención", "No se encuentran datos registrados para la fecha especificada").show();
+								return;
+							}
+							
+							
 							//messageDialogBuilder.createInfo("Error", "SIZE: " + points.size()).show();
 							
-							layerManagerWidget.addVector(routeLayer);
-							layerManagerWidget.setSelectedLayer(LayerManagerWidget.VECTOR_TAB, routeLayer);	
+							
 							
 							
 							WKT reader = new WKT();
 							List<Point> pointList = new ArrayList<Point>();
 							
+							int totalSpeed = 0;
+							String imei = points.get(0).getImei();
+							String date = getDateAsString(points.get(0).getDate());
 							
+							Point previusPoint = null;
 							for(PointRegisterJSO point: points) {
 																
 								VectorFeature f = reader.read(point.getPosition())[0];	
 								
 								Geometry g = f.getGeometry();
-								Point p = Point.narrowToPoint(g.getJSObject());
-								String position = p.getX() + " , " + p.getY();
+								Point currentPoint = Point.narrowToPoint(g.getJSObject());
+								String position = currentPoint.getX() + " , " + currentPoint.getY();
 								
 								f.getGeometry().transform(layerConfig.getProjection(),
 										layerConfig.getDefaultProjection());
@@ -159,21 +187,35 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 								
 								
 								
-								f.getAttributes().setAttribute("IMEI", point.getImei());
-								f.getAttributes().setAttribute("FECHA", getDateAsString(point.getDate()));
-								f.getAttributes().setAttribute("HORA", getTimeAsString(point.getDate()));
-								f.getAttributes().setAttribute("VELOCIDAD", point.getSpeed());
-								f.getAttributes().setAttribute("DATOS", point.getDatos());
-								f.getAttributes().setAttribute("POSICION", position);
+								f.getAttributes().setAttribute(IMEI, point.getImei());
+								f.getAttributes().setAttribute(DATE, getDateAsString(point.getDate()));
+								f.getAttributes().setAttribute(TIME, getTimeAsString(point.getDate()));
+								int speed = Double.valueOf(point.getSpeed()).intValue();
+								
+								f.getAttributes().setAttribute(SPEED, speed);
+								f.getAttributes().setAttribute(DATA, point.getDatos());
+								f.getAttributes().setAttribute(POSITION, position);
+								
 								
 								g = f.getGeometry();
-//								if (g.getClassName().equals(
-//						                org.gwtopenmaps.openlayers.client.geometry.Geometry.POINT_CLASS_NAME)) {
-						             p = Point.narrowToPoint(g.getJSObject());
-						            pointList.add(p);
-//								} 
+								currentPoint = Point.narrowToPoint(g.getJSObject());
+						        pointList.add(currentPoint);
+ 
+						        
+								if(previusPoint == null) {									
+									f.getAttributes().setAttribute(LENGTH, 0);									
+								}
+								else {
+									List<Point> segment = new ArrayList<Point>();
+									segment.add(previusPoint);
+									segment.add(currentPoint);
+																		
+									LineString line = new LineString(segment.toArray(new Point[]{}));									
+									f.getAttributes().setAttribute(LENGTH, line.getLength());	
+								}
 								
-								
+								previusPoint = currentPoint;
+						        totalSpeed = totalSpeed + speed;
 							
 								
 							}
@@ -185,11 +227,24 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 							
 						        final VectorFeature lineFeature = new VectorFeature(line);
 						        routeLayer.addFeature(lineFeature);
+						        lineFeature.getAttributes().setAttribute(IMEI, imei);
+						        lineFeature.getAttributes().setAttribute(DATE, date);
+								//f.getAttributes().setAttribute(TIME, getTimeAsString(point.getDate()));
+						        lineFeature.getAttributes().setAttribute(SPEED, (totalSpeed/points.size()));
+								//f.getAttributes().setAttribute(DATA, point.getDatos());
+								//f.getAttributes().setAttribute(POSITION, position);
+						        lineFeature.getAttributes().setAttribute(LENGTH, line.getLength());
+						     
 						        
-						        routeLayer.getStyle().setStrokeColor("#339933");
-						        routeLayer.getStyle().setStrokeWidth(3);
-						        routeLayer.getStyle().setPointRadius(6);
+						        String color = routeLayer.getVectorStyle().getFill().getNormalColor();
+						        routeLayer.getVectorStyle().getLine().setNormalColor(color);
+						        routeLayer.getVectorStyle().getLine().setThickness(3);
+						        
+						        //routeLayer.getStyle().setPointRadius(6);
 							
+						        layerManagerWidget.addVector(routeLayer);
+						        routeLayer.redraw();
+								layerManagerWidget.setSelectedLayer(LayerManagerWidget.VECTOR_TAB, routeLayer);	
 						        geoMap.getMap().zoomToExtent(routeLayer.getDataExtent());
 							
 							
@@ -204,7 +259,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 	public String getDateAsString(int[] date) {
 		String dateAsString = "";
 		if (date != null && date.length >= 3) {
-			dateAsString = date[0] + "-" + date[1] + "-" + date[2];
+			dateAsString = date[2] + "/" + date[1] + "/" + date[0];
 		}
 		return dateAsString;
 	}
@@ -216,7 +271,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 				time.append(date[i] + ":");
 			}
 		}
-		return time.toString();
+		return time.toString().substring(0, time.length()-1);
 	}
 	
 

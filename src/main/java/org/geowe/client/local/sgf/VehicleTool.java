@@ -30,22 +30,19 @@ import javax.enterprise.context.ApplicationScoped;
 import org.geowe.client.local.ImageProvider;
 import org.geowe.client.local.layermanager.LayerManagerWidget;
 import org.geowe.client.local.main.map.GeoMap;
-import org.geowe.client.local.main.tool.ButtonTool;
 import org.geowe.client.local.ui.MessageDialogBuilder;
-import org.geowe.client.shared.rest.sgf.SGFVehicleService;
 import org.geowe.client.shared.rest.sgf.model.jso.CompanyJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.SessionJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.VehicleJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.VehicleListResponseJSO;
-import org.jboss.errai.common.client.api.RemoteCallback;
-import org.jboss.errai.enterprise.client.jaxrs.api.RestClient;
-import org.jboss.errai.enterprise.client.jaxrs.api.RestErrorCallback;
 
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.sencha.gxt.core.client.Style.Side;
+import com.sencha.gxt.widget.core.client.button.TextButton;
+import com.sencha.gxt.widget.core.client.event.SelectEvent;
+import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
+import com.sencha.gxt.widget.core.client.tips.ToolTipConfig;
 
 /**
  * Attribute search tool.
@@ -54,7 +51,7 @@ import com.sencha.gxt.core.client.Style.Side;
  *
  */
 @ApplicationScoped
-public class VehicleTool extends ButtonTool {
+public class VehicleTool extends TextButton { //ButtonTool
 
 	@Inject
 	private VehicleDialog vehicleDialog;
@@ -72,16 +69,37 @@ public class VehicleTool extends ButtonTool {
 
 	@Inject
 	public VehicleTool(GeoMap geoMap) {
-		super("Listado de vehículos",
-				ImageProvider.INSTANCE.search32());
+		super("Vehículos",
+				ImageProvider.INSTANCE.vehicles());
 		setToolTipConfig(createTooltipConfig(
 				"Listado de vehículos",
 				"Listado de vehículos de una compañía", Side.LEFT));
-		setEnabled(false);
+		registerSelectHandler();
+	}
+	
+	protected ToolTipConfig createTooltipConfig(String title, String body,
+			Side position) {
+		ToolTipConfig toolTipconfig = new ToolTipConfig();
+		toolTipconfig.setTitleHtml(title);
+		toolTipconfig.setBodyHtml(body);
+		toolTipconfig.setMouseOffsetX(0);
+		toolTipconfig.setMouseOffsetY(0);
+		toolTipconfig.setAnchor(position);
+
+		return toolTipconfig;
+	}
+	
+	private void registerSelectHandler() {
+		addSelectHandler(new SelectHandler() {
+			@Override
+			public void onSelect(SelectEvent event) {
+				onRelease();
+			}
+		});
 	}
 
-	@Override
-	protected void onRelease() {				
+	
+	public void onRelease() {				
 		CompanyJSO company = session.getCompany();				
 		vehicleDialog.setCompany(company);
 		loadVehicles(session.getToken(), company.getId());

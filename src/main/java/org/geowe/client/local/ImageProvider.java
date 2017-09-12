@@ -384,4 +384,10 @@ public interface ImageProvider extends ClientBundle {
 	
 	@Source("images/ic_circle_progress-24.gif")
 	ImageResource circleProgress();
+	
+	@Source("images/ic_car-24.png")
+	ImageResource vehicles();
+	
+	@Source("images/ic_exit-24.png")
+	ImageResource exit();
 }

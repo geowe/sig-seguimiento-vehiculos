@@ -16,4 +16,10 @@ public interface SampleDataProvider extends ClientBundle {
 	
 	@Source("sampledata/listRegisterPoint.json")
 	TextResource listRegisterPoint();
+	
+	@Source("sampledata/20-puntos_registrados_example.json")
+	TextResource list20RegisterPoint();
+	
+	@Source("sampledata/500-puntos_registrados_example.json")
+	TextResource list500RegisterPoint();
 }
