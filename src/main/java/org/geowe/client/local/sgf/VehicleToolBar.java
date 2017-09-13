@@ -42,6 +42,10 @@ public class VehicleToolBar extends ContentPanel {
 	@Inject
 	@New
 	private RouteVehicleTool routeVehicleTool;
+	
+	//@Inject
+	//@New
+	//private LastPointRegisterVehicleTool lastPointRegisterVehicleTool;
 //	@Inject
 //	@New
 //	private SingleFeatureInfoTool singleFeatureInfoTool;
@@ -70,6 +74,7 @@ public class VehicleToolBar extends ContentPanel {
 	@PostConstruct
 	private void initialize() {
 		addTool(routeVehicleTool);
+		//addTool(lastPointRegisterVehicleTool);
 //		addTool(selectVectorFeatureTool);
 //		addTool(singleFeatureInfoTool);
 //		addTool(createNewLayerTool);
@@ -87,7 +92,8 @@ public class VehicleToolBar extends ContentPanel {
 		return tools;
 	}
 		
-	public void setVehicleJSO(VehicleJSO vehicleJSO) {
-		routeVehicleTool.setVehicleJSO(vehicleJSO);
+	public void setVehicles(List<VehicleJSO> vehicles) {
+		routeVehicleTool.setVehicles(vehicles);
+		//lastPointRegisterVehicleTool.setVehicles(vehicles);
 	}
 }

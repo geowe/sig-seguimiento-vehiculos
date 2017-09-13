@@ -22,6 +22,7 @@
  */
 package org.geowe.client.local.sgf;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,18 +34,22 @@ import org.geowe.client.local.ImageProvider;
 import org.geowe.client.local.layermanager.LayerManagerWidget;
 import org.geowe.client.local.layermanager.tool.LayerTool;
 import org.geowe.client.local.main.map.GeoMap;
+import org.geowe.client.local.messages.UIMessages;
 import org.geowe.client.local.model.vector.VectorLayer;
 import org.geowe.client.local.model.vector.VectorLayerConfig;
 import org.geowe.client.local.model.vector.VectorLayerFactory;
 import org.geowe.client.local.ui.MessageDialogBuilder;
+import org.geowe.client.local.ui.ProgressBarDialog;
 import org.geowe.client.shared.rest.sgf.model.jso.PointRegisterJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.PointRegisterListResponseJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.VehicleJSO;
+import org.gwtopenmaps.openlayers.client.Projection;
 import org.gwtopenmaps.openlayers.client.feature.VectorFeature;
 import org.gwtopenmaps.openlayers.client.format.WKT;
 import org.gwtopenmaps.openlayers.client.geometry.Geometry;
 import org.gwtopenmaps.openlayers.client.geometry.LineString;
 import org.gwtopenmaps.openlayers.client.geometry.Point;
+import org.jboss.errai.common.client.api.tasks.ClientTaskManager;
 
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.resources.client.ImageResource;
@@ -56,206 +61,278 @@ import com.sencha.gxt.widget.core.client.form.DateField;
 
 /**
  * Herramienta para trazar en el mapa la ruta de puntos GPS de un vehículo
+ * 
  * @author jose@geowe.org
  * 
  */
 @ApplicationScoped
 public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
+	private static final Projection DEFAULT_PROJECTION = new Projection(GeoMap.INTERNAL_EPSG);
+	private static final String PREFIX_LAYER = "r_";
+	private static final String GPS_DEFAULT_PROJECTION = "EPSG:4326";
 	private static final String IMEI = "IMEI";
 	private static final String DATE = "FECHA";
 	private static final String TIME = "HORA";
-	private static final String SPEED = "VELOCIDAD";
+	private static final String SPEED = "VEL(Km/h)";
 	private static final String DATA = "DATOS";
 	private static final String POSITION = "POSICION";
-	private static final String LENGTH = "LONGITUD";
-	
+	private static final String DISTANCE = "DIST(m)";
+	private static final String ACCUMULATED_DISTANCE = "DIST ACU(m)";
+	private static final String STREET = "CALLE";
+	private static final String NUMBER = "Nº";
+	private static final String LOCALITY = "LOCALIDAD";
+	private static final String PROVINCE = "PROVINCIA"; 
+	private static final String POSTAL_CODE = "CP";
+	private static final String COUNTRY = "PAIS";
 	
 	private DateField field = new DateField();
-	private VehicleJSO vehicleJSO;
-	
-	public void setVehicleJSO(VehicleJSO vehicleJSO) {
-		this.vehicleJSO = vehicleJSO;
-	}
+	private List<VehicleJSO> vehicles;
+	private ProgressBarDialog autoMessageBox;
 
 	@Inject
 	private MessageDialogBuilder messageDialogBuilder;
 
 	@Inject
+	private ClientTaskManager taskManager;
+
+	@Inject
 	public RouteVehicleTool(LayerManagerWidget layerTreeWidget, GeoMap geoMap) {
 		super(layerTreeWidget, geoMap);
+		setEnabled(false);
 	}
 
 	@Override
 	public String getName() {
 		return "Draw route";
 	}
-	
+
 	@Override
 	public ImageResource getIcon() {
 		return ImageProvider.INSTANCE.lineString();
 	}
 
 	@Override
-	public void onClick() {			
-			field.setEditable(false);
-	        final Dialog box = new Dialog();
-	        box.setHeadingText("Date");
-	        box.add(field);
-	        box.setModal(true);
-	        box.setPredefinedButtons(PredefinedButton.OK, PredefinedButton.CANCEL);
-	        box.setHideOnButtonClick(true);
-	        box.getButton(PredefinedButton.OK).addSelectHandler(
-					new SelectHandler() {
-						@Override
-						public void onSelect(final SelectEvent event) {
-							
-							
-							VectorLayerConfig layerConfig = null;
-							VectorLayer routeLayer = null;
+	public void onClick() {
+		
+		if (vehicles == null || vehicles.isEmpty()) {
+			messageDialogBuilder.createInfo("Atención",
+					"Debe seleccionar un vehículo").show();
+			return;
+		}
+		
+		
+		field.setEditable(false);
+		final Dialog box = new Dialog();
+		box.setHeadingText("Date");
+		box.add(field);
+		box.setModal(true);
+		box.setPredefinedButtons(PredefinedButton.OK, PredefinedButton.CANCEL);
+		box.setHideOnButtonClick(true);
+		box.getButton(PredefinedButton.OK).addSelectHandler(
+				new SelectHandler() {
+					@Override
+					public void onSelect(final SelectEvent event) {
 
-							try {
-								layerConfig = new VectorLayerConfig();
-								layerConfig.setEpsg("EPSG:4326");
-								layerConfig.setLayerName("Route_" + vehicleJSO.getPlate());								
-								
-								routeLayer = VectorLayerFactory.createEmptyVectorLayer(layerConfig);								
-								routeLayer.addAttribute(IMEI, false);
-								routeLayer.addAttribute(DATE, false);
-								routeLayer.addAttribute(TIME, false);
-								routeLayer.addAttribute(SPEED, false);
-								routeLayer.addAttribute(DATA, false);
-								routeLayer.addAttribute(POSITION, false);
-								routeLayer.addAttribute(LENGTH, false);
-
-//								layer = VectorLayerFactory.createVectorLayerFromGeoData(layerConfig);
-
-							} catch (Exception e) {
-								//showAlert(UIMessages.INSTANCE.gditAlertMessage());
-								messageDialogBuilder.createInfo("Error", e.getMessage()).show();
-							}
-
-							//29085257
-							//39213844
-							String plate = "";
-							
-							if("29085257".equals(vehicleJSO.getPlate())) {
-								plate = SampleDataProvider.INSTANCE.list20RegisterPoint().getText();
-							}
-							else if("39213844".equals(vehicleJSO.getPlate())) {
-								plate = SampleDataProvider.INSTANCE.list500RegisterPoint().getText();
-							}
-							
-							
-							
-							
-							PointRegisterListResponseJSO pointRegisterResponse = JsonUtils.safeEval(plate);							
-							PointRegisterJSO[] pointRegisters = pointRegisterResponse.getPointRegisterListEmbededJSO().getPointRegister();							
-							List<PointRegisterJSO> points = Arrays.asList(pointRegisters);
-							
-							if(points.size() == 0) {
-								messageDialogBuilder.createInfo("Atención", "No se encuentran datos registrados para la fecha especificada").show();
-								return;
-							}
-							
-							
-							//messageDialogBuilder.createInfo("Error", "SIZE: " + points.size()).show();
-							
-							
-							
-							
-							WKT reader = new WKT();
-							List<Point> pointList = new ArrayList<Point>();
-							
-							int totalSpeed = 0;
-							String imei = points.get(0).getImei();
-							String date = getDateAsString(points.get(0).getDate());
-							
-							Point previusPoint = null;
-							for(PointRegisterJSO point: points) {
-																
-								VectorFeature f = reader.read(point.getPosition())[0];	
-								
-								Geometry g = f.getGeometry();
-								Point currentPoint = Point.narrowToPoint(g.getJSObject());
-								String position = currentPoint.getX() + " , " + currentPoint.getY();
-								
-								f.getGeometry().transform(layerConfig.getProjection(),
-										layerConfig.getDefaultProjection());
-								
-								
-								routeLayer.addFeature(f);
-								
-								
-								
-								f.getAttributes().setAttribute(IMEI, point.getImei());
-								f.getAttributes().setAttribute(DATE, getDateAsString(point.getDate()));
-								f.getAttributes().setAttribute(TIME, getTimeAsString(point.getDate()));
-								int speed = Double.valueOf(point.getSpeed()).intValue();
-								
-								f.getAttributes().setAttribute(SPEED, speed);
-								f.getAttributes().setAttribute(DATA, point.getDatos());
-								f.getAttributes().setAttribute(POSITION, position);
-								
-								
-								g = f.getGeometry();
-								currentPoint = Point.narrowToPoint(g.getJSObject());
-						        pointList.add(currentPoint);
- 
-						        
-								if(previusPoint == null) {									
-									f.getAttributes().setAttribute(LENGTH, 0);									
-								}
-								else {
-									List<Point> segment = new ArrayList<Point>();
-									segment.add(previusPoint);
-									segment.add(currentPoint);
-																		
-									LineString line = new LineString(segment.toArray(new Point[]{}));									
-									f.getAttributes().setAttribute(LENGTH, line.getLength());	
-								}
-								
-								previusPoint = currentPoint;
-						        totalSpeed = totalSpeed + speed;
-							
-								
-							}
-							
-							//messageDialogBuilder.createInfo("Error", "feature SIZE: " + routeLayer.getFeatures().length).show();
-							
-							LineString line = new LineString(pointList.toArray(new Point[]{}));
-							
-							
-						        final VectorFeature lineFeature = new VectorFeature(line);
-						        routeLayer.addFeature(lineFeature);
-						        lineFeature.getAttributes().setAttribute(IMEI, imei);
-						        lineFeature.getAttributes().setAttribute(DATE, date);
-								//f.getAttributes().setAttribute(TIME, getTimeAsString(point.getDate()));
-						        lineFeature.getAttributes().setAttribute(SPEED, (totalSpeed/points.size()));
-								//f.getAttributes().setAttribute(DATA, point.getDatos());
-								//f.getAttributes().setAttribute(POSITION, position);
-						        lineFeature.getAttributes().setAttribute(LENGTH, line.getLength());
-						     
-						        
-						        String color = routeLayer.getVectorStyle().getFill().getNormalColor();
-						        routeLayer.getVectorStyle().getLine().setNormalColor(color);
-						        routeLayer.getVectorStyle().getLine().setThickness(3);
-						        
-						        //routeLayer.getStyle().setPointRadius(6);
-							
-						        layerManagerWidget.addVector(routeLayer);
-						        routeLayer.redraw();
-								layerManagerWidget.setSelectedLayer(LayerManagerWidget.VECTOR_TAB, routeLayer);	
-						        geoMap.getMap().zoomToExtent(routeLayer.getDataExtent());
-							
-							
+						final String date = field.getText();
+						
+						if(date.isEmpty()) {
+							messageDialogBuilder.createInfo("Atención",
+									"Debe intoducir una fecha válida").show();
+							return;
 						}
-					});
-	        box.show();
+
+						autoMessageBox = new ProgressBarDialog(false,
+								UIMessages.INSTANCE.processing());
+						autoMessageBox.show();
+
+						taskManager.execute(new Runnable() {
+
+							@Override
+							public void run() {
+								for (VehicleJSO vehicle : vehicles) {
+									createRouteLayer(vehicle, date);
+								}
+								autoMessageBox.hide();
+							}
+						});
+					}
+				});
+		box.show();
+	}
+
+	public void setVehicles(List<VehicleJSO> vehicles) {
+		setEnabled(true);
+		this.vehicles = vehicles;
+	}
+
+	private void createRouteLayer(VehicleJSO vehicleJSO, String dateToSearch) {
+		VectorLayerConfig layerConfig = createVectorLayerConfig(vehicleJSO, dateToSearch);
+		VectorLayer routeLayer = createEmptyRouteLayer(layerConfig);
+		List<PointRegisterJSO> points = getSamplePoints(vehicleJSO);
+
+		if (points.size() == 0) {
+			messageDialogBuilder
+					.createInfo("Atención",
+							"No se encuentran datos registrados para la fecha especificada")
+					.show();
+			return;
+		}
+
+		WKT reader = new WKT();
+		List<Point> pointList = new ArrayList<Point>();
+
+		int totalSpeed = 0;
+		float accumulatedDistance = 0f;
+		String imei = points.get(0).getImei();
+		String date = getDateAsString(points.get(0).getDate());
+
+		Point previusPoint = null;
+		for (PointRegisterJSO point : points) {
+
+			VectorFeature f = reader.read(point.getPosition())[0];
+
+			Geometry g = f.getGeometry();
+			Point currentPoint = Point.narrowToPoint(g.getJSObject());
+			String position = currentPoint.getX() + " , " + currentPoint.getY();
+
+			f.getGeometry().transform(layerConfig.getProjection(),
+					layerConfig.getDefaultProjection());
+
+			routeLayer.addFeature(f);
+
+			f.getAttributes().setAttribute(IMEI, point.getImei());
+			f.getAttributes().setAttribute(DATE,
+					getDateAsString(point.getDate()));
+			f.getAttributes().setAttribute(TIME,
+					getTimeAsString(point.getDate()));
+			int speed = Double.valueOf(point.getSpeed()).intValue();
+
+			f.getAttributes().setAttribute(SPEED, speed);
+			f.getAttributes().setAttribute(DATA, point.getDatos());
+			f.getAttributes().setAttribute(POSITION, position);
+
+			g = f.getGeometry();
+			currentPoint = Point.narrowToPoint(g.getJSObject());
+			pointList.add(currentPoint);
+
+			if (previusPoint == null) {
+				f.getAttributes().setAttribute(DISTANCE, 0);
+			} else {
+				List<Point> segment = new ArrayList<Point>();
+				segment.add(previusPoint);
+				segment.add(currentPoint);
+
+				LineString line = new LineString(
+						segment.toArray(new Point[] {}));
+				
+				accumulatedDistance = accumulatedDistance + setDistance(f, line);
+				f.getAttributes().setAttribute(ACCUMULATED_DISTANCE, accumulatedDistance);
+//				f.getAttributes().setAttribute(DISTANCE,
+//						getReoundedMeasure(line.getGeodesicLength(DEFAULT_PROJECTION), 2));
+			}
+			
+			f.getAttributes().setAttribute(STREET, point.getStreet());
+			f.getAttributes().setAttribute(NUMBER, point.getNumber());
+			f.getAttributes().setAttribute(LOCALITY, point.getLocality());
+			f.getAttributes().setAttribute(PROVINCE, point.getProvince());
+			f.getAttributes().setAttribute(POSTAL_CODE, point.getPostalCode());
+			f.getAttributes().setAttribute(COUNTRY, point.getCountry());
+			
+			previusPoint = currentPoint;
+			totalSpeed = totalSpeed + speed;
+
+		}
+
+		LineString line = new LineString(pointList.toArray(new Point[] {}));
+
+		final VectorFeature lineFeature = new VectorFeature(line);
+		routeLayer.addFeature(lineFeature);
+		lineFeature.getAttributes().setAttribute(IMEI, imei);
+		lineFeature.getAttributes().setAttribute(DATE, date);
+		lineFeature.getAttributes().setAttribute(SPEED,
+				(totalSpeed / points.size()));
+		
+		
+		setDistance(lineFeature, line);
+//		lineFeature.getAttributes().setAttribute(DISTANCE,
+//				getReoundedMeasure(line.getGeodesicLength(DEFAULT_PROJECTION), 2));
+
+		String color = routeLayer.getVectorStyle().getFill().getNormalColor();
+		routeLayer.getVectorStyle().getLine().setNormalColor(color);
+		routeLayer.getVectorStyle().getLine().setThickness(3);
+
+		layerManagerWidget.addVector(routeLayer);
+		routeLayer.redraw();
+		layerManagerWidget.setSelectedLayer(LayerManagerWidget.VECTOR_TAB,
+				routeLayer);
+		geoMap.getMap().zoomToExtent(routeLayer.getDataExtent());
 	}
 	
-	
-	//https://docs.sencha.com/gxt/4.x/guides/ui/fields/DateField.html
-	
+	private float setDistance(VectorFeature feature, LineString line) {
+		float distance = getReoundedMeasure(line.getGeodesicLength(DEFAULT_PROJECTION), 2);
+		feature.getAttributes().setAttribute(DISTANCE, distance);
+		return distance;
+	}
+
+	private VectorLayerConfig createVectorLayerConfig(VehicleJSO vehicleJSO, String date) {
+
+		VectorLayerConfig layerConfig = new VectorLayerConfig();
+		layerConfig.setEpsg(GPS_DEFAULT_PROJECTION);
+		layerConfig.setLayerName(PREFIX_LAYER + vehicleJSO.getPlate() + "_" + date);
+
+		return layerConfig;
+	}
+
+	private VectorLayer createEmptyRouteLayer(VectorLayerConfig layerConfig) {
+
+		VectorLayer routeLayer = null;
+
+		try {
+
+			routeLayer = VectorLayerFactory.createEmptyVectorLayer(layerConfig);
+			routeLayer.addAttribute(IMEI, false);
+			routeLayer.addAttribute(DATE, false);
+			routeLayer.addAttribute(TIME, false);
+			routeLayer.addAttribute(SPEED, false);
+			routeLayer.addAttribute(DATA, false);
+			routeLayer.addAttribute(POSITION, false);
+			routeLayer.addAttribute(DISTANCE, false);
+			routeLayer.addAttribute(ACCUMULATED_DISTANCE, false);			
+			routeLayer.addAttribute(STREET, false);
+			routeLayer.addAttribute(NUMBER, false);
+			routeLayer.addAttribute(LOCALITY, false);
+			routeLayer.addAttribute(PROVINCE, false);
+			routeLayer.addAttribute(POSTAL_CODE, false);
+			routeLayer.addAttribute(COUNTRY, false);
+			
+
+		} catch (Exception e) {
+			messageDialogBuilder.createInfo("Error", e.getMessage()).show();
+		}
+
+		return routeLayer;
+	}
+
+	private List<PointRegisterJSO> getSamplePoints(VehicleJSO vehicleJSO) {
+		String plate = "";
+
+		if ("29085257".equals(vehicleJSO.getPlate())) {
+			plate = SampleDataProvider.INSTANCE.list20RegisterPoint().getText();
+		} else if ("39213844".equals(vehicleJSO.getPlate())) {
+			plate = SampleDataProvider.INSTANCE.list500RegisterPoint()
+					.getText();
+		}
+
+		PointRegisterListResponseJSO pointRegisterResponse = JsonUtils
+				.safeEval(plate);
+		PointRegisterJSO[] pointRegisters = pointRegisterResponse
+				.getPointRegisterListEmbededJSO().getPointRegister();
+		List<PointRegisterJSO> points = Arrays.asList(pointRegisters);
+		return points;
+	}
+
+	// https://docs.sencha.com/gxt/4.x/guides/ui/fields/DateField.html
+
 	public String getDateAsString(int[] date) {
 		String dateAsString = "";
 		if (date != null && date.length >= 3) {
@@ -271,9 +348,13 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 				time.append(date[i] + ":");
 			}
 		}
-		return time.toString().substring(0, time.length()-1);
+		return time.toString().substring(0, time.length() - 1);
 	}
-	
 
-	
+	private float getReoundedMeasure(double measure, int decimal) {
+		BigDecimal bd = new BigDecimal(Double.toString(measure));
+		bd = bd.setScale(decimal, BigDecimal.ROUND_HALF_UP);
+		return bd.floatValue();
+	}
+
 }

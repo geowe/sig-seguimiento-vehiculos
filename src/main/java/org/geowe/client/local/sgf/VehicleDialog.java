@@ -181,8 +181,8 @@ public class VehicleDialog extends Dialog {
 					@Override
 					public void onSelectionChanged(
 							SelectionChangedEvent<VehicleJSO> event) {
-						VehicleJSO selected = event.getSelection().get(0);
-						vehicleToolBar.setVehicleJSO(selected);
+						List<VehicleJSO> selected = event.getSelection();						
+						vehicleToolBar.setVehicles(selected);						
 					}
 				});
 

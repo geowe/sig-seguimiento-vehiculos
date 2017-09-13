@@ -22,4 +22,7 @@ public interface SampleDataProvider extends ClientBundle {
 	
 	@Source("sampledata/500-puntos_registrados_example.json")
 	TextResource list500RegisterPoint();
+	
+	@Source("sampledata/lastPointRegister.json")
+	TextResource lastPointRegister();
 }
