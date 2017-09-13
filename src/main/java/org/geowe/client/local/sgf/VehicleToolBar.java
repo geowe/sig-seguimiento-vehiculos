@@ -27,7 +27,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.New;
 import javax.inject.Inject;
 
 import org.geowe.client.shared.rest.sgf.model.jso.VehicleJSO;
@@ -40,12 +39,12 @@ import com.sencha.gxt.widget.core.client.ContentPanel;
 public class VehicleToolBar extends ContentPanel {
 
 	@Inject
-	@New
+	//@New
 	private RouteVehicleTool routeVehicleTool;
 	
-	//@Inject
+	@Inject
 	//@New
-	//private LastPointRegisterVehicleTool lastPointRegisterVehicleTool;
+	private LastPointRegisterVehicleTool lastPointRegisterVehicleTool;
 //	@Inject
 //	@New
 //	private SingleFeatureInfoTool singleFeatureInfoTool;
@@ -63,7 +62,7 @@ public class VehicleToolBar extends ContentPanel {
 
 	public VehicleToolBar() {
 		super();
-		setHeight("200px");
+		setHeight("100px");
 		setHeaderVisible(false);
 
 		tools = new ArrayList<VehicleButtonTool>();
@@ -74,7 +73,7 @@ public class VehicleToolBar extends ContentPanel {
 	@PostConstruct
 	private void initialize() {
 		addTool(routeVehicleTool);
-		//addTool(lastPointRegisterVehicleTool);
+		addTool(lastPointRegisterVehicleTool);
 //		addTool(selectVectorFeatureTool);
 //		addTool(singleFeatureInfoTool);
 //		addTool(createNewLayerTool);
@@ -94,6 +93,6 @@ public class VehicleToolBar extends ContentPanel {
 		
 	public void setVehicles(List<VehicleJSO> vehicles) {
 		routeVehicleTool.setVehicles(vehicles);
-		//lastPointRegisterVehicleTool.setVehicles(vehicles);
+		lastPointRegisterVehicleTool.setVehicles(vehicles);
 	}
 }

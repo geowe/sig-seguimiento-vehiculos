@@ -22,10 +22,7 @@
  */
 package org.geowe.client.local.sgf;
 
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -50,6 +47,7 @@ import org.gwtopenmaps.openlayers.client.geometry.Point;
 import org.jboss.errai.common.client.api.tasks.ClientTaskManager;
 
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.resources.client.ImageResource;
 
 /**
@@ -58,7 +56,7 @@ import com.google.gwt.resources.client.ImageResource;
  * @author jose@geowe.org
  * 
  */
-//@ApplicationScoped
+@ApplicationScoped
 public class LastPointRegisterVehicleTool extends LayerTool implements
 		VehicleButtonTool {
 	
@@ -112,10 +110,10 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 
 	@Override
 	public void onClick() {
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Calendar cal = Calendar.getInstance();
-		final String currentDate = dateFormat.format(cal);
-
+		DateTimeFormat fmt = DateTimeFormat.getFormat("yyyy-MM-dd");
+		Date today = new Date();
+		
+		final String currentDate = fmt.format(today);
 		autoMessageBox = new ProgressBarDialog(false,
 				UIMessages.INSTANCE.processing());
 		autoMessageBox.show();

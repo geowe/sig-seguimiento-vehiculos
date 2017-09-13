@@ -25,6 +25,7 @@ package org.geowe.client.local.sgf;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -52,6 +53,7 @@ import org.gwtopenmaps.openlayers.client.geometry.Point;
 import org.jboss.errai.common.client.api.tasks.ClientTaskManager;
 
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.resources.client.ImageResource;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
@@ -122,6 +124,11 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 		
 		
 		field.setEditable(false);
+		
+		DateTimeFormat fmt = DateTimeFormat.getFormat("yyyy-MM-dd");
+		Date today = new Date();
+		field.setText(fmt.format(today));
+		
 		final Dialog box = new Dialog();
 		box.setHeadingText("Date");
 		box.add(field);
@@ -226,7 +233,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 						segment.toArray(new Point[] {}));
 				
 				accumulatedDistance = accumulatedDistance + setDistance(f, line);
-				f.getAttributes().setAttribute(ACCUMULATED_DISTANCE, accumulatedDistance);
+				f.getAttributes().setAttribute(ACCUMULATED_DISTANCE, getReoundedMeasure(accumulatedDistance, 2));
 //				f.getAttributes().setAttribute(DISTANCE,
 //						getReoundedMeasure(line.getGeodesicLength(DEFAULT_PROJECTION), 2));
 			}
