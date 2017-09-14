@@ -130,9 +130,10 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 		field.setText(fmt.format(today));
 		
 		final Dialog box = new Dialog();
-		box.setHeadingText("Date");
+		box.setHeadingText("Seleccione fecha");
 		box.add(field);
 		box.setModal(true);
+		box.setResizable(false);
 		box.setPredefinedButtons(PredefinedButton.OK, PredefinedButton.CANCEL);
 		box.setHideOnButtonClick(true);
 		box.getButton(PredefinedButton.OK).addSelectHandler(

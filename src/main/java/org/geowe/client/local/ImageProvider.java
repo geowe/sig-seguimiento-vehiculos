@@ -390,4 +390,14 @@ public interface ImageProvider extends ClientBundle {
 	
 	@Source("images/ic_exit-24.png")
 	ImageResource exit();
+	
+	
+	@Source("images/ic_marker_car_red-24.png")
+	ImageResource markerCarRed24();
+	
+	@Source("images/ic_marker_car_blue-24.png")
+	ImageResource markerCarBlue24();
+	
+	@Source("images/ic_marker_car_green-24.png")
+	ImageResource markerCarGreen24();
 }

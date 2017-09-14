@@ -22,6 +22,7 @@
  */
 package org.geowe.client.local.sgf;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -39,7 +40,11 @@ import org.geowe.client.local.model.vector.VectorLayerFactory;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.geowe.client.local.ui.ProgressBarDialog;
 import org.geowe.client.shared.rest.sgf.model.jso.PointRegisterJSO;
+import org.geowe.client.shared.rest.sgf.model.jso.PointRegisterListResponseJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.VehicleJSO;
+import org.gwtopenmaps.openlayers.client.LonLat;
+import org.gwtopenmaps.openlayers.client.Style;
+import org.gwtopenmaps.openlayers.client.StyleMap;
 import org.gwtopenmaps.openlayers.client.feature.VectorFeature;
 import org.gwtopenmaps.openlayers.client.format.WKT;
 import org.gwtopenmaps.openlayers.client.geometry.Geometry;
@@ -105,7 +110,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 
 	@Override
 	public ImageResource getIcon() {
-		return ImageProvider.INSTANCE.circle();
+		return ImageProvider.INSTANCE.searchGeocoding24();
 	}
 
 	@Override
@@ -144,7 +149,11 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 				.getVector(LAYER_NAME);
 		if (vehicleLayer == null) {
 			vehicleLayer = createEmptyPointRegisterLayer(layerConfig);
+			vehicleLayer.setStyleMap(getStyleMap());
 			layerManagerWidget.addVector(vehicleLayer);
+		}
+		else {
+			removeLastPoint(vehicleLayer, vehicleJSO.getPlate());
 		}
 
 		PointRegisterJSO point = getSamplePoint(vehicleJSO);
@@ -192,15 +201,21 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 		f.getAttributes().setAttribute(COMMENT, vehicleJSO.getComments());
 		f.getAttributes().setAttribute(STATUS, vehicleJSO.getStatus());
 
-		String color = vehicleLayer.getVectorStyle().getFill().getNormalColor();
-		vehicleLayer.getVectorStyle().getLine().setNormalColor(color);
-		vehicleLayer.getVectorStyle().getLine().setThickness(3);
-
+//		String color = vehicleLayer.getVectorStyle().getFill().getNormalColor();
+//		vehicleLayer.getVectorStyle().getLine().setNormalColor(color);
+//		vehicleLayer.getVectorStyle().getLine().setThickness(3);
 		
-		vehicleLayer.redraw();
+		
+		//vehicleLayer.redraw();
 		layerManagerWidget.setSelectedLayer(LayerManagerWidget.VECTOR_TAB,
 				vehicleLayer);
-		geoMap.getMap().zoomToExtent(vehicleLayer.getDataExtent());
+		//geoMap.getMap().zoomToExtent(vehicleLayer.getDataExtent());
+		
+		g = f.getGeometry();
+		currentPoint = Point.narrowToPoint(g.getJSObject());
+		final LonLat lonLat = new LonLat(currentPoint.getX(), currentPoint.getY());
+		geoMap.getMap().panTo(lonLat);
+		geoMap.getMap().setCenter(lonLat, 20);
 	}
 
 	private VectorLayerConfig createVectorLayerConfig(VehicleJSO vehicleJSO) {
@@ -220,6 +235,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 		try {
 
 			routeLayer = VectorLayerFactory.createEmptyVectorLayer(layerConfig);
+			routeLayer.addAttribute(PLATE, false);
 			routeLayer.addAttribute(IMEI, false);
 			routeLayer.addAttribute(DATE, false);
 			routeLayer.addAttribute(TIME, false);
@@ -233,8 +249,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 			routeLayer.addAttribute(PROVINCE, false);
 			routeLayer.addAttribute(POSTAL_CODE, false);
 			routeLayer.addAttribute(COUNTRY, false);
-
-			routeLayer.addAttribute(PLATE, false);
+			
 			routeLayer.addAttribute(KM_REVISION, false);
 			routeLayer.addAttribute(LAST_REVISION, false);
 			routeLayer.addAttribute(COMMENT, false);
@@ -248,10 +263,15 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 	}
 
 	private PointRegisterJSO getSamplePoint(VehicleJSO vehicleJSO) {
-		String plate = SampleDataProvider.INSTANCE.lastPointRegister()
+		String data = SampleDataProvider.INSTANCE.lastPointRegister()
 				.getText();
-		PointRegisterJSO point = JsonUtils.safeEval(plate);
-
+		
+		PointRegisterListResponseJSO pointRegisterResponse = JsonUtils
+				.safeEval(data);
+		
+		PointRegisterJSO point = pointRegisterResponse
+				.getPointRegisterListEmbededJSO().getPointRegister()[0];
+				
 		return point;
 	}
 
@@ -273,5 +293,43 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 			}
 		}
 		return time.toString().substring(0, time.length() - 1);
+	}
+	
+	private void removeLastPoint(VectorLayer vehicleLayer, String plate) {
+		List<VectorFeature> features = Arrays.asList(vehicleLayer.getFeatures());
+		
+		for(VectorFeature feature: features) {
+			String featurePlate = feature.getAttributes().getAttributeAsString(PLATE);
+			if(plate.equals(featurePlate)) {
+				vehicleLayer.removeFeature(feature);
+				break;
+			}			
+		}
+	}
+	
+	private StyleMap getStyleMap() {				
+		final Style style = createStyle(ImageProvider.INSTANCE.markerCarRed24()
+				.getSafeUri().asString());
+
+		final Style hoverStyle = createStyle(ImageProvider.INSTANCE.markerCarBlue24()
+				.getSafeUri().asString());
+
+		final Style selectStyle = createStyle(ImageProvider.INSTANCE.markerCarGreen24()
+				.getSafeUri().asString());
+
+		return new StyleMap(style, selectStyle, hoverStyle);
+	}
+
+	private Style createStyle(final String imageUrl) {
+		final Style style = new Style();
+		style.setGraphicOpacity(1);
+		style.setGraphicSize(24, 30);
+		style.setGraphicOffset(-12, -30);
+		style.setExternalGraphic(imageUrl);
+
+		style.setBackgroundGraphic(ImageProvider.INSTANCE.w3wShadow()
+				.getSafeUri().asString());
+		style.setBackgroundOffset(0, -28);
+		return style;
 	}
 }
