@@ -30,6 +30,7 @@ import org.geowe.client.local.initializer.URLVectorLayerInitializer;
 import org.geowe.client.local.main.AnchorBuilder;
 import org.geowe.client.local.messages.UIMessages;
 import org.geowe.client.local.sgf.SGFLoginServiceProxy;
+import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.slf4j.Logger;
 
 import com.google.gwt.core.client.GWT;
@@ -62,6 +63,8 @@ public class Welcome {
 	private URLVectorLayerInitializer uRLVectorLayerInitializer;
 	@Inject
 	private SGFLoginServiceProxy sgfLoginServiceProxy;
+	@Inject
+	private MessageDialogBuilder messageDialogBuilder;
 
 	private Dialog welcomeDialog;
 
@@ -91,10 +94,17 @@ public class Welcome {
 					new SelectHandler() {
 						@Override
 						public void onSelect(final SelectEvent event) {
+							if(isEmptyCredential()) {
+								messageDialogBuilder.createInfo("Atención", "Debe rellenar las credenciales correctamente").show();
+								return;
+							}
+							
+							
+							
 							uRLVectorLayerInitializer.createLayerFromURL();
 							logger.info("ok pressed...");
 							progressImage.setVisible(true);
-							// TODO: comprobar campos (que no sean vacios)
+
 							String userName = userNameField.getText();
 							String passwd = passwordField.getText();
 
@@ -104,6 +114,15 @@ public class Welcome {
 		}
 
 		welcomeDialog.show();
+	}
+	
+	private boolean isEmptyCredential() {
+		boolean isEmpty = false;
+		if(userNameField.getText().trim().isEmpty() || passwordField.getText().trim().isEmpty()) {
+			isEmpty = true;
+		}
+		
+		return isEmpty;
 	}
 
 	public void hideDialog() {
