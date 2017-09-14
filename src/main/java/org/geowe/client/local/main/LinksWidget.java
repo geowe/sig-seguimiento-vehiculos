@@ -22,13 +22,19 @@
  */
 package org.geowe.client.local.main;
 
+import java.util.List;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.geowe.client.local.ImageProvider;
 import org.geowe.client.local.layermanager.LayerManagerWidget;
+import org.geowe.client.local.layermanager.LayerTree;
 import org.geowe.client.local.main.map.SimpleMapVerticalLegend;
 import org.geowe.client.local.messages.UIMessages;
+import org.geowe.client.local.sgf.VehicleTool;
+import org.geowe.client.local.welcome.Welcome;
+import org.gwtopenmaps.openlayers.client.layer.Layer;
 
 import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Unit;
@@ -61,6 +67,12 @@ public class LinksWidget implements IsWidget {
 	
 	@Inject
 	private LayerManagerWidget layerManager;
+	
+	@Inject
+	private VehicleTool vehicleTool;
+	
+	@Inject
+	private Welcome welcome;
 
 	@Override
 	public Widget asWidget() {
@@ -93,7 +105,8 @@ public class LinksWidget implements IsWidget {
 
 	private void setDefaultLinks() {
 		AnchorBuilder abuilder = new AnchorBuilder();
-		
+		hp.add(createExitDialogAnchor());
+		hp.add(vehicleTool);
 		hp.add(createPreviewDialogAnchor());
 //		hp.add(abuilder.getGeoWEWebLink());
 //		hp.add(abuilder.getGooglePlusLink());
@@ -112,8 +125,34 @@ public class LinksWidget implements IsWidget {
 		hp.clear();
 	}
 	
-	
+	private TextButton createExitDialogAnchor() {
+		TextButton showButton = new TextButton();
+		showButton.setIcon(ImageProvider.INSTANCE.exit());
+		showButton.setText("Salir");
+		showButton.setTitle("Exit");
+		showButton.addSelectHandler(new SelectHandler() {
+			@Override
+			public void onSelect(SelectEvent event) {
+//				LayerTree vectorLayerTree = layerManager.getLayerTree(LayerManagerWidget.VECTOR_TAB);
+//				List<Layer> layers = vectorLayerTree.getLayers();
+//				
+//				for(Layer layer: layers) {
+//					vectorLayerTree.remove(layer);
+//				}
+//				
+//				welcome.showDialog();
+				forceReload();
+			}
+		});
 
+		return showButton;
+	}
+	
+	
+	public static native void forceReload() /*-{
+	    $wnd.location.reload(true);
+	}-*/;
+	
 	private TextButton createPreviewDialogAnchor() {
 		TextButton showButton = new TextButton();
 		showButton.setIcon(ImageProvider.INSTANCE.printLogo());
