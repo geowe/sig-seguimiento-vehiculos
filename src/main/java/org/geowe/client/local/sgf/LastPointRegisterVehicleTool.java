@@ -71,9 +71,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 	private static final String DATE = "FECHA";
 	private static final String TIME = "HORA";
 	private static final String SPEED = "VEL(Km/h)";
-	private static final String DATA = "DATOS";
 	private static final String POSITION = "POSICION";
-	private static final String DISTANCE = "DIST(m)";
 	private static final String STREET = "CALLE";
 	private static final String NUMBER = "Nº";
 	private static final String LOCALITY = "LOCALIDAD";
@@ -86,6 +84,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 	private static final String LAST_REVISION = "ULT. REVI.";
 	private static final String COMMENT = "COMENTARIO";
 	private static final String STATUS = "ESTADO";
+	private static final String DATA = "DATOS";
 
 	private List<VehicleJSO> vehicles;
 	private ProgressBarDialog autoMessageBox;
@@ -172,7 +171,8 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 
 		Geometry g = f.getGeometry();
 		Point currentPoint = Point.narrowToPoint(g.getJSObject());
-		String position = currentPoint.getX() + " , " + currentPoint.getY();
+		String position = "lon: " + currentPoint.getX() + " lat: "
+				+ currentPoint.getY();
 
 		f.getGeometry().transform(layerConfig.getProjection(),
 				layerConfig.getDefaultProjection());
@@ -185,7 +185,6 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 		int speed = Double.valueOf(point.getSpeed()).intValue();
 
 		f.getAttributes().setAttribute(SPEED, speed);
-		f.getAttributes().setAttribute(DATA, point.getDatos());
 		f.getAttributes().setAttribute(POSITION, position);
 
 		f.getAttributes().setAttribute(STREET, point.getStreet());
@@ -200,6 +199,9 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 		f.getAttributes().setAttribute(LAST_REVISION, vehicleJSO.getLastRevisionDate());
 		f.getAttributes().setAttribute(COMMENT, vehicleJSO.getComments());
 		f.getAttributes().setAttribute(STATUS, vehicleJSO.getStatus());
+		// TODO: pendiente de modelar los datos
+		f.getAttributes()
+				.setAttribute(DATA, point.getDatos().replace(",", " "));
 
 //		String color = vehicleLayer.getVectorStyle().getFill().getNormalColor();
 //		vehicleLayer.getVectorStyle().getLine().setNormalColor(color);
@@ -240,9 +242,9 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 			routeLayer.addAttribute(DATE, false);
 			routeLayer.addAttribute(TIME, false);
 			routeLayer.addAttribute(SPEED, false);
-			routeLayer.addAttribute(DATA, false);
+
 			routeLayer.addAttribute(POSITION, false);
-			routeLayer.addAttribute(DISTANCE, false);
+
 			routeLayer.addAttribute(STREET, false);
 			routeLayer.addAttribute(NUMBER, false);
 			routeLayer.addAttribute(LOCALITY, false);
@@ -254,6 +256,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 			routeLayer.addAttribute(LAST_REVISION, false);
 			routeLayer.addAttribute(COMMENT, false);
 			routeLayer.addAttribute(STATUS, false);
+			routeLayer.addAttribute(DATA, false);
 
 		} catch (Exception e) {
 			messageDialogBuilder.createInfo("Error", e.getMessage()).show();
