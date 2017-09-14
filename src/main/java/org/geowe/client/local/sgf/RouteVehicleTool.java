@@ -201,7 +201,8 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 
 			Geometry g = f.getGeometry();
 			Point currentPoint = Point.narrowToPoint(g.getJSObject());
-			String position = currentPoint.getX() + " , " + currentPoint.getY();
+			String position = "lon: " + currentPoint.getX() + " lat: "
+					+ currentPoint.getY();
 
 			f.getGeometry().transform(layerConfig.getProjection(),
 					layerConfig.getDefaultProjection());
@@ -216,7 +217,9 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 			int speed = Double.valueOf(point.getSpeed()).intValue();
 
 			f.getAttributes().setAttribute(SPEED, speed);
-			f.getAttributes().setAttribute(DATA, point.getDatos());
+			// TODO: pendiente de modelar los datos
+			f.getAttributes().setAttribute(DATA,
+					point.getDatos().replace(",", " "));
 			f.getAttributes().setAttribute(POSITION, position);
 
 			g = f.getGeometry();
@@ -302,7 +305,6 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 			routeLayer.addAttribute(DATE, false);
 			routeLayer.addAttribute(TIME, false);
 			routeLayer.addAttribute(SPEED, false);
-			routeLayer.addAttribute(DATA, false);
 			routeLayer.addAttribute(POSITION, false);
 			routeLayer.addAttribute(DISTANCE, false);
 			routeLayer.addAttribute(ACCUMULATED_DISTANCE, false);			
@@ -312,6 +314,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 			routeLayer.addAttribute(PROVINCE, false);
 			routeLayer.addAttribute(POSTAL_CODE, false);
 			routeLayer.addAttribute(COUNTRY, false);
+			routeLayer.addAttribute(DATA, false);
 			
 
 		} catch (Exception e) {
