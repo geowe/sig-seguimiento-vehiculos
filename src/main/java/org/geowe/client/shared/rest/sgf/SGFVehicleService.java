@@ -63,5 +63,15 @@ public interface SGFVehicleService {
 	@Path("vehicles/{id}")
 	Vehicle get(@HeaderParam("Authorization") String authorization,
 			@PathParam("id") int id);
+	
+	
+	@GET
+	@Consumes("application/json")
+	@Produces("application/json")
+	@Path("/vehicles/{vehicleId}/active-gps-device")
+	String getActiveGPSDevice(@HeaderParam("Authorization") String authorization,
+			@PathParam("vehicleId") int id);
+	
+	
 
 }

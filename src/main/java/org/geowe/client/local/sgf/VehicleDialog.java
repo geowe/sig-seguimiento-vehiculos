@@ -34,6 +34,7 @@ import org.geowe.client.local.messages.UICatalogMessages;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.geowe.client.local.ui.PagingFeatureGrid;
 import org.geowe.client.shared.rest.sgf.model.jso.CompanyJSO;
+import org.geowe.client.shared.rest.sgf.model.jso.SessionJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.VehicleJSO;
 import org.gwtopenmaps.openlayers.client.feature.VectorFeature;
 import org.slf4j.Logger;
@@ -205,9 +206,13 @@ public class VehicleDialog extends Dialog {
 	}
 		
 	
-	public void setCompany(CompanyJSO company) {
+	public void setSession(SessionJSO session) {
+		
+		CompanyJSO company = session.getCompany();
 		this.companyNameField.setText(company.getName());
 		this.companyCifField.setText(company.getCif());
+		
+		vehicleToolBar.setSession(session);
 	}
 
 	
@@ -237,8 +242,8 @@ public class VehicleDialog extends Dialog {
 			public void render(Context context, VehicleJSO value,
 					SafeHtmlBuilder sb) {
 				sb.appendHtmlConstant("<p style='margin: 5px 5px 10px'><b>"
-						+ UICatalogMessages.INSTANCE.description() + ":</b> "
-						+ value.getKmsLeftForRevision() + "</p>");
+						+ "Comentario" + ":</b> "
+						+ value.getComments() + "</p>");
 			}
 		});
 	}
@@ -267,13 +272,20 @@ public class VehicleDialog extends Dialog {
 						+ "Última revisión" + "</b>"));
 		lastRevisionDateColumn.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);	
 		
+		ColumnConfig<VehicleJSO, String> kmRevisionColumn = new ColumnConfig<VehicleJSO, String>(
+				props.kmsLeftForRevision(), 200, SafeHtmlUtils.fromTrustedString("<b>"
+						+ "Km revisión" + "</b>"));
+		kmRevisionColumn.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);	
+		
+		
+		
 				
 		List<ColumnConfig<VehicleJSO, ?>> columns = new ArrayList<ColumnConfig<VehicleJSO, ?>>();
 		columns.add(rowExpander);
 		columns.add(plateColumn);
 		columns.add(statusColumn);	
 		columns.add(lastRevisionDateColumn);
-		
+		columns.add(kmRevisionColumn);
 		
 		return new ColumnModel<VehicleJSO>(columns);
 	}

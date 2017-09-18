@@ -54,87 +54,74 @@ public class SGFLoginServiceProxy {
 
 	public void login(String userName, String password) {
 		
-		if(true) {
+		/*if(true) {
 			welcome.hideProgressImage();
 			welcome.hideDialog();
 			SessionJSO session = JsonUtils.safeEval(SampleDataProvider.INSTANCE.session().getText());
 			vehicleTool.setSession(session);			
-			vehicleTool.onRelease();
-			
-			
-			
-//			CompanyJSO company = session.getCompany();
-			//messageDialogBuilder.createInfo("Bienvenido", session.getFirstSurname() + " de la compay: " + company.getName() + "[" + company.getCif()+ "]" ).show();
-			
-//			VehicleListResponseJSO vehicleListResponse = JsonUtils.safeEval(SampleDataProvider.INSTANCE.listVehicle().getText());
-//			
-//			List<VehicleJSO> vehicles = Arrays.asList(vehicleListResponse.getVehicleListEmbededJSO().getVehicles());
-//			
-//			messageDialogBuilder.createInfo("vehiculos: ",  "Num vehiculos: " + vehicles.size()).show();
-//			
-//			for(VehicleJSO vehicle: vehicles) {
-//				messageDialogBuilder.createInfo("matricula: ",  "matricula: " + vehicle.getPlate()).show();
-//			}
+			vehicleTool.onRelease();			
 			
 			return;
-		}
+		}*/
 		
 		
 		
-//		sgfServiceAsync.login(userName, password, new AsyncCallback<String>() {
-//
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				messageDialogBuilder.createError("Error", UISgfMessages.INSTANCE.authError()).show();
-//				welcome.hideProgressImage();
-//			}
-//
-//			@Override
-//			public void onSuccess(String sessionJson) {
-//				welcome.hideProgressImage();
-//				welcome.hideDialog();
-//				SessionJSO session = JsonUtils.safeEval(sessionJson);
-//				CompanyJSO company = session.getCompany();				
+		sgfServiceAsync.login(userName, password, new AsyncCallback<String>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				messageDialogBuilder.createError("Error", UISgfMessages.INSTANCE.authError()).show();
+				welcome.hideProgressImage();
+			}
+
+			@Override
+			public void onSuccess(String sessionJson) {
+				welcome.hideProgressImage();
+				welcome.hideDialog();
+				SessionJSO session = JsonUtils.safeEval(sessionJson);
+				vehicleTool.setSession(session);	
+				vehicleTool.onRelease();
+				
+//				CompanyJSO company = session.getCompany();							
 //				getVehicles(session.getToken(), company.getId());				
-//			}
+			}
+
+		});
+	}
+
+	
+	
+//	private void getVehicles(String token, int companyId) {
+//		RestClient.create(SGFVehicleService.class, "http://10.79.213.50:8081",
+//				new RemoteCallback<String>() {
 //
-//		});
-	}
-
-	
-	
-	private void getVehicles(String token, int companyId) {
-		RestClient.create(SGFVehicleService.class, "http://10.79.213.50:8081",
-				new RemoteCallback<String>() {
-
-					@Override
-					public void callback(String vehicleListResponseJson) {												
-						VehicleListResponseJSO vehicleListResponse = JsonUtils.safeEval(vehicleListResponseJson);						
-						List<VehicleJSO> vehicles = Arrays.asList(vehicleListResponse.getVehicleListEmbededJSO().getVehicles());
-						
-						
-						
-						for(VehicleJSO vehicle: vehicles) {
-							messageDialogBuilder.createInfo("matricula: ",  "matricula: " + vehicle.getPlate()).show();
-						}
-
-					}
-				},
-
-				new RestErrorCallback() {
-					
-					@Override
-					public boolean error(Request message, Throwable throwable) {
-						//messageDialogBuilder.createError("Error", UISgfMessages.INSTANCE.authError()).show();
-						
-						messageDialogBuilder.createInfo("Error",  throwable.getMessage()).show();
-						
-						return false;
-					}
-				}, Response.SC_OK).get(token, companyId, 10, "id");
-			
-
-	}
+//					@Override
+//					public void callback(String vehicleListResponseJson) {												
+//						VehicleListResponseJSO vehicleListResponse = JsonUtils.safeEval(vehicleListResponseJson);						
+//						List<VehicleJSO> vehicles = Arrays.asList(vehicleListResponse.getVehicleListEmbededJSO().getVehicles());
+//						-
+//							
+//						vehicleTool.onRelease();	
+//						
+//						
+//
+//					}
+//				},
+//
+//				new RestErrorCallback() {
+//					
+//					@Override
+//					public boolean error(Request message, Throwable throwable) {
+//						//messageDialogBuilder.createError("Error", UISgfMessages.INSTANCE.authError()).show();
+//						
+//						messageDialogBuilder.createInfo("Error",  throwable.getMessage()).show();
+//						
+//						return false;
+//					}
+//				}, Response.SC_OK).get(token, companyId, 10, "id");
+//			
+//
+//	}
 	
 	// TODO: TEST
 	private void getCompanies() {

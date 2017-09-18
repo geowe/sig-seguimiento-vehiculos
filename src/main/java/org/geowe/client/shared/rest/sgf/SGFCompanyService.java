@@ -43,5 +43,17 @@ public interface SGFCompanyService {
 	@Path("/{id}")
 	Vehicle get(@HeaderParam("Authorization") String authorization,
 			@PathParam("id") int id);
+	
+	
+	@GET	
+	@Consumes("application/json")
+	@Path("/{id}/registered-points")
+	String getRegisteredPoint(@HeaderParam("Authorization") String authorization,
+			@PathParam("id") int id,
+			@QueryParam("imei")String imei,
+			@QueryParam("startdate")String startDate,
+			@QueryParam("enddate")String endDate,
+			@QueryParam("size")int size,
+			@QueryParam("sort")String sort);
 
 }
