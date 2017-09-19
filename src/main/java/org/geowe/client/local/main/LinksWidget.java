@@ -33,6 +33,7 @@ import org.geowe.client.local.layermanager.LayerTree;
 import org.geowe.client.local.main.map.SimpleMapVerticalLegend;
 import org.geowe.client.local.messages.UIMessages;
 import org.geowe.client.local.sgf.VehicleTool;
+import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.geowe.client.local.welcome.Welcome;
 import org.gwtopenmaps.openlayers.client.layer.Layer;
 
@@ -128,19 +129,11 @@ public class LinksWidget implements IsWidget {
 	private TextButton createExitDialogAnchor() {
 		TextButton showButton = new TextButton();
 		showButton.setIcon(ImageProvider.INSTANCE.exit());
-		showButton.setText("Salir");
-		showButton.setTitle("Exit");
+		showButton.setText(UISgfMessages.INSTANCE.exit());
+		showButton.setTitle(UISgfMessages.INSTANCE.exit());
 		showButton.addSelectHandler(new SelectHandler() {
 			@Override
 			public void onSelect(SelectEvent event) {
-//				LayerTree vectorLayerTree = layerManager.getLayerTree(LayerManagerWidget.VECTOR_TAB);
-//				List<Layer> layers = vectorLayerTree.getLayers();
-//				
-//				for(Layer layer: layers) {
-//					vectorLayerTree.remove(layer);
-//				}
-//				
-//				welcome.showDialog();
 				forceReload();
 			}
 		});
