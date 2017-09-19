@@ -30,13 +30,10 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.geowe.client.local.ImageProvider;
-import org.geowe.client.local.messages.UICatalogMessages;
-import org.geowe.client.local.ui.MessageDialogBuilder;
-import org.geowe.client.local.ui.PagingFeatureGrid;
+import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.geowe.client.shared.rest.sgf.model.jso.CompanyJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.SessionJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.VehicleJSO;
-import org.gwtopenmaps.openlayers.client.feature.VectorFeature;
 import org.slf4j.Logger;
 
 import com.google.gwt.cell.client.AbstractCell;
@@ -63,42 +60,28 @@ import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent;
 import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent.SelectionChangedHandler;
 
 /**
- * Diálogo para la búsqueda de elementos, por atributo, de la capa seleccionada
+ * Diálogo que muestra la lista de vehículos de una empresa
  * 
- * @author geowe
+ * @author jose@geowe.org
  *
  */
 @ApplicationScoped
 public class VehicleDialog extends Dialog {
-	//public static final int FEATURES_PER_PAGE = 50;
+
 	private static final String FIELD_WIDTH = "225px";
 	@Inject
 	private Logger logger;
 	@Inject
-	private VehicleToolBar vehicleToolBar;
-	@Inject
-	private MessageDialogBuilder messageDialogBuilder;
-
+	private VehicleToolBar vehicleToolBar;	
 	private TextField companyNameField;
-	private TextField companyCifField;
-	//private TextButton searchButton;
-
-	//private VectorLayer selectedLayer;
-	private PagingFeatureGrid featureGrid;
-
-	//private ComboBox<FeatureAttributeDef> attributeCombo;
-
-	//private CheckBox isCaseSensitive;
-	
+	private TextField companyCifField;	
 	private ListStore<VehicleJSO> vehicleStore;
 	private static final VehicleJSOProperties vehicleProps = GWT.create(VehicleJSOProperties.class);
-	//private Grid<VehicleJSO> vehicleGrid;
 	
-
 	public VehicleDialog() {
 		super();
 		this.getHeader().setIcon(ImageProvider.INSTANCE.layer16());
-		this.setHeadingText("Vehículos");
+		this.setHeadingText(UISgfMessages.INSTANCE.vehicleLayerName());
 		this.setPredefinedButtons(PredefinedButton.CLOSE);
 		this.setPixelSize(560, 520);
 		this.setModal(false);
@@ -109,39 +92,29 @@ public class VehicleDialog extends Dialog {
 	@PostConstruct
 	private void initialize() {
 		add(createPanel());
-		//addKeyShortcuts();
 	}
 
 	private Widget createPanel() {
 
 		VerticalPanel vPanel = new VerticalPanel();
 		vPanel.setPixelSize(490, 420);
-		//vPanel.setPixelSize(490, 90);
-		vPanel.setSpacing(5);
-		
-		//vPanel.add(createTopPanel());
+		vPanel.setSpacing(5);		
 		vPanel.add(createCompanyPanel());
 		vPanel.add(createGridPanel());
 		
-		
-		
-
 		return vPanel;
 	}
-
 	
 	private HorizontalPanel createCompanyPanel(){
 		HorizontalPanel hPanel = new HorizontalPanel();
 		hPanel.setSpacing(10);
 		hPanel.addStyleName(ThemeStyles.get().style().borderBottom());
 		hPanel.addStyleName(ThemeStyles.get().style().borderTop());
-		//hPanel.add(getAttrCombo());
 		hPanel.add(getCompanyNamePanel());
 		hPanel.add(getCompanyCifPanel());
 		
 		return hPanel;
-	}
-	
+	}	
 	
 	private VerticalPanel getCompanyNamePanel() {
 		VerticalPanel vPanel = new VerticalPanel();
@@ -149,7 +122,7 @@ public class VehicleDialog extends Dialog {
 		companyNameField = new TextField();
 		companyNameField.setEnabled(false);
 		companyNameField.setWidth(FIELD_WIDTH);
-		vPanel.add(new Label("Compañía"));
+		vPanel.add(new Label(UISgfMessages.INSTANCE.companyLabel()));
 		vPanel.add(companyNameField);
 		
 		return vPanel;
@@ -162,7 +135,7 @@ public class VehicleDialog extends Dialog {
 		companyCifField = new TextField();
 		companyCifField.setEnabled(false);
 		companyCifField.setWidth(FIELD_WIDTH);
-		vPanel.add(new Label("CIF"));
+		vPanel.add(new Label(UISgfMessages.INSTANCE.cifLabel()));
 		vPanel.add(companyCifField);
 		
 		return vPanel;
@@ -170,9 +143,8 @@ public class VehicleDialog extends Dialog {
 	}
 
 	private HorizontalPanel createGridPanel() {
-//		HorizontalLayoutContainer hPanel = new HorizontalLayoutContainer();
 		HorizontalPanel hPanel = new HorizontalPanel();
-		hPanel.setSize("510px", "320px");//"220px"
+		hPanel.setSize("510px", "320px");
 		
 		vehicleStore = new ListStore<VehicleJSO>(vehicleProps.key());
 		Grid<VehicleJSO> vehiculeGrid = createGrid(vehicleStore, vehicleProps);
@@ -190,22 +162,17 @@ public class VehicleDialog extends Dialog {
 		VerticalLayoutContainer gridContainer = new VerticalLayoutContainer();
 		gridContainer.setWidth(500);
 		gridContainer.setHeight(320);
-		gridContainer.add(vehiculeGrid, new VerticalLayoutData(1, 1));
-				
+		gridContainer.add(vehiculeGrid, new VerticalLayoutData(1, 1));				
 		hPanel.add(gridContainer);
-
 		hPanel.add(vehicleToolBar);
 		return hPanel;
 	}
 
-
-	
 	public void setVehicle(List<VehicleJSO> vehicles) {
 		vehicleStore.clear();
 		vehicleStore.addAll(vehicles);
 	}
 		
-	
 	public void setSession(SessionJSO session) {
 		
 		CompanyJSO company = session.getCompany();
@@ -214,9 +181,6 @@ public class VehicleDialog extends Dialog {
 		
 		vehicleToolBar.setSession(session);
 	}
-
-	
-
 	
 	private Grid<VehicleJSO> createGrid(ListStore<VehicleJSO> dataStore,
 			VehicleJSOProperties properties) {
@@ -242,8 +206,8 @@ public class VehicleDialog extends Dialog {
 			public void render(Context context, VehicleJSO value,
 					SafeHtmlBuilder sb) {
 				sb.appendHtmlConstant("<p style='margin: 5px 5px 10px'><b>"
-						+ "Comentario" + ":</b> "
-						+ value.getComments() + "</p>");
+						+ UISgfMessages.INSTANCE.commentColumn() + ":</b> "
+						+ value.getComments().replaceAll("null", UISgfMessages.INSTANCE.noCommentLabel()) + "</p>");
 			}
 		});
 	}
@@ -257,28 +221,25 @@ public class VehicleDialog extends Dialog {
 		
 		ColumnConfig<VehicleJSO, String> plateColumn = new ColumnConfig<VehicleJSO, String>(
 				props.plate(), 200, SafeHtmlUtils.fromTrustedString("<b>"
-						+ "Matrícula" + "</b>"));
+						+ UISgfMessages.INSTANCE.plateColumn() + "</b>"));
 		
 		plateColumn.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);		
 		
 		ColumnConfig<VehicleJSO, String> statusColumn = new ColumnConfig<VehicleJSO, String>(
 				props.status(), 200, SafeHtmlUtils.fromTrustedString("<b>"
-						+ "Estado" + "</b>"));
+						+ UISgfMessages.INSTANCE.statusColumn() + "</b>"));
 		statusColumn.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		
 		
 		ColumnConfig<VehicleJSO, String> lastRevisionDateColumn = new ColumnConfig<VehicleJSO, String>(
 				props.lastRevisionDate(), 200, SafeHtmlUtils.fromTrustedString("<b>"
-						+ "Última revisión" + "</b>"));
+						+ UISgfMessages.INSTANCE.lastReviewColumn() + "</b>"));
 		lastRevisionDateColumn.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);	
 		
 		ColumnConfig<VehicleJSO, String> kmRevisionColumn = new ColumnConfig<VehicleJSO, String>(
 				props.kmsLeftForRevision(), 200, SafeHtmlUtils.fromTrustedString("<b>"
-						+ "Km revisión" + "</b>"));
+						+ UISgfMessages.INSTANCE.kmForReviewColumn() + "</b>"));
 		kmRevisionColumn.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);	
-		
-		
-		
 				
 		List<ColumnConfig<VehicleJSO, ?>> columns = new ArrayList<ColumnConfig<VehicleJSO, ?>>();
 		columns.add(rowExpander);

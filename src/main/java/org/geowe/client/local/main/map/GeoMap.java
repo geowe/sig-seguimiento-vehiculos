@@ -91,7 +91,7 @@ public class GeoMap implements ChangeSelectedLayerListener{
 		mapOptions.setMaxExtent(getDefaultMapBound());
 		mapOptions.setMaxResolution(appClientProperties.getFloatValue("maxResolution"));
 		getMap().setOptions(mapOptions);
-		getMap().setMinMaxZoomLevel(0, 50);
+		getMap().setMinMaxZoomLevel(0, 20);
  	}
  	
  	public MapOptions getMapOptions() {

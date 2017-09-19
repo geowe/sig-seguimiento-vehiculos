@@ -31,6 +31,7 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.geowe.client.local.AppClientProperties;
 import org.geowe.client.local.ImageProvider;
 import org.geowe.client.local.layermanager.LayerManagerWidget;
 import org.geowe.client.local.layermanager.tool.LayerTool;
@@ -39,6 +40,7 @@ import org.geowe.client.local.messages.UIMessages;
 import org.geowe.client.local.model.vector.VectorLayer;
 import org.geowe.client.local.model.vector.VectorLayerConfig;
 import org.geowe.client.local.model.vector.VectorLayerFactory;
+import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.geowe.client.local.ui.ProgressBarDialog;
 import org.geowe.client.shared.rest.sgf.SGFCompanyService;
@@ -80,29 +82,34 @@ import com.sencha.gxt.widget.core.client.form.DateField;
  */
 @ApplicationScoped
 public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
+	
+	private static final String DATE_FORMAT = "yyyy-MM-dd";
 	private static final Projection DEFAULT_PROJECTION = new Projection(GeoMap.INTERNAL_EPSG);
 	private static final String PREFIX_LAYER = "r_";
 	private static final String GPS_DEFAULT_PROJECTION = "EPSG:4326";
-	private static final String IMEI = "IMEI";
-	private static final String DATE = "FECHA";
-	private static final String TIME = "HORA";
-	private static final String SPEED = "VEL(Km/h)";
-	private static final String DATA = "DATOS";
-	private static final String POSITION = "POSICION";
-	private static final String DISTANCE = "DIST(m)";
-	private static final String ACCUMULATED_DISTANCE = "DIST ACU(m)";
-	private static final String STREET = "CALLE";
-	private static final String NUMBER = "Nº";
-	private static final String LOCALITY = "LOCALIDAD";
-	private static final String PROVINCE = "PROVINCIA"; 
-	private static final String POSTAL_CODE = "CP";
-	private static final String COUNTRY = "PAIS";
+	private static final String IMEI = UISgfMessages.INSTANCE.imeiColumn();
+	private static final String DATE = UISgfMessages.INSTANCE.dateColumn();
+	private static final String TIME = UISgfMessages.INSTANCE.timeColumn();
+	private static final String SPEED = UISgfMessages.INSTANCE.speedColumn();
+	private static final String DATA = UISgfMessages.INSTANCE.dataColumn();
+	private static final String POSITION = UISgfMessages.INSTANCE.positionColumn();
+	private static final String DISTANCE = UISgfMessages.INSTANCE.distanceColumn();
+	private static final String ACCUMULATED_DISTANCE = UISgfMessages.INSTANCE.acummulatedDistanceColumn();
+	private static final String STREET = UISgfMessages.INSTANCE.streetColumn();
+	private static final String NUMBER = UISgfMessages.INSTANCE.numberColumn();
+	private static final String LOCALITY = UISgfMessages.INSTANCE.localityColumn();
+	private static final String PROVINCE = UISgfMessages.INSTANCE.provinceColumn();
+	private static final String POSTAL_CODE = UISgfMessages.INSTANCE.postalCodeColumn();
+	private static final String COUNTRY = UISgfMessages.INSTANCE.countryColumn();
 	
 	private SessionJSO session;
 	private DateField field = new DateField();
 	private List<VehicleJSO> vehicles;
 	private ProgressBarDialog autoMessageBox;
-
+	
+	@Inject
+	private SGFServiceInfo SGFServiceInfo;
+	
 	@Inject
 	private MessageDialogBuilder messageDialogBuilder;
 
@@ -117,7 +124,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 
 	@Override
 	public String getName() {
-		return "Draw route";
+		return UISgfMessages.INSTANCE.drawRoute();
 	}
 
 	@Override
@@ -128,18 +135,14 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 	@Override
 	public void onClick() {
 		
-		
-		
-		
-		field.setEditable(false);
-		
-		final DateTimeFormat fmt = DateTimeFormat.getFormat("yyyy-MM-dd");
+		field.setEditable(false);		
+		final DateTimeFormat fmt = DateTimeFormat.getFormat(DATE_FORMAT);
 		final Date today = new Date();
 		
 		field.setText(fmt.format(today));
 		
 		final Dialog box = new Dialog();
-		box.setHeadingText("Seleccione fecha");
+		box.setHeadingText(UISgfMessages.INSTANCE.selectDate());
 		box.add(field);
 		box.setModal(true);
 		box.setResizable(false);
@@ -158,34 +161,29 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 
 						autoMessageBox = new ProgressBarDialog(false,
 								UIMessages.INSTANCE.processing());
-						
-						
+												
 						autoMessageBox.show();
-
 						taskManager.execute(new Runnable() {
 
 							@Override
 							public void run() {
-								for (VehicleJSO vehicle : vehicles) {
-									
+								for (VehicleJSO vehicle : vehicles) {									
 									//getSamplePoints(vehicle, startDate, endDate);
 									getPoints(vehicle, startDate, endDate);
 
 								}
-								//autoMessageBox.hide();
 							}
 						});
 					}
 				});
 		box.show();
-	}
-	
+	}	
 	
 	private void getPoints(final VehicleJSO vehicle, final String startDate, final String endDate) {
 		
-		autoMessageBox.setProgressStatusMessage("Obteniendo IMEI...");
+		autoMessageBox.setProgressStatusMessage(UISgfMessages.INSTANCE.getIMEI());
 		
-		RestClient.create(SGFVehicleService.class, "http://10.79.213.50:8081",
+		RestClient.create(SGFVehicleService.class,  SGFServiceInfo.getURL(),
 				new RemoteCallback<String>() {
 
 					@Override
@@ -195,7 +193,6 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 						CompanyJSO company = session.getCompany();
 						getRequestRegisteredPoint(session.getToken(), company.getId(), activeGPS.getImei(), vehicle, startDate, endDate);
 						
-
 					}
 				},
 
@@ -203,9 +200,8 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 					
 					@Override
 					public boolean error(Request message, Throwable throwable) {
-						//messageDialogBuilder.createError("Error", UISgfMessages.INSTANCE.authError()).show();
 						autoMessageBox.hide();
-						messageDialogBuilder.createInfo("Error",  throwable.getMessage()).show();
+						messageDialogBuilder.createInfo(UIMessages.INSTANCE.edtAlertDialogTitle(),  UISgfMessages.INSTANCE.notGPSFound()).show();
 						
 						return false;
 					}
@@ -215,9 +211,9 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 	
 			
 	private void getRequestRegisteredPoint(String token, int companyId, final String imei, final VehicleJSO vehicle, final String startDate, final String endDate) {
-		autoMessageBox.setProgressStatusMessage("Obteniendo datos GPS...");
+		autoMessageBox.setProgressStatusMessage(UISgfMessages.INSTANCE.getGPSData());
 		
-		RestClient.create(SGFCompanyService.class, "http://10.79.213.50:8081",
+		RestClient.create(SGFCompanyService.class, SGFServiceInfo.getURL(),
 				new RemoteCallback<String>() {
 
 					@Override
@@ -231,7 +227,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 						List<PointRegisterJSO> points = Arrays.asList(pointRegisters);
 						
 						if(points.isEmpty()) {
-							messageDialogBuilder.createInfo("Atención",  "No se encuentran datos GPS").show();
+							messageDialogBuilder.createInfo(UIMessages.INSTANCE.edtAlertDialogTitle(),  UISgfMessages.INSTANCE.gpsDataNotFound()).show();
 							return;
 						}
 						
@@ -245,15 +241,12 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 					
 					@Override
 					public boolean error(Request message, Throwable throwable) {
-						//messageDialogBuilder.createError("Error", UISgfMessages.INSTANCE.authError()).show();
 						autoMessageBox.hide();
-						messageDialogBuilder.createInfo("Error",  throwable.getMessage()).show();
+						messageDialogBuilder.createInfo(UISgfMessages.INSTANCE.errorDetected(),  throwable.getMessage()).show();
 						
 						return false;
 					}
-				}, Response.SC_OK).getRegisteredPoint(token, vehicle.getId(), imei, startDate, endDate, 500, "date,desc");
-			
-		//companies/1/registered-points?imei=352094080938183&startdate=2017-05-25&enddate=2017-05-26&size=1&sort=date,desc
+				}, Response.SC_OK).getRegisteredPoints(token, vehicle.getId(), imei, startDate, endDate, 500, "date,desc");			
 	}
 	
 
@@ -438,8 +431,6 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 		
 		
 	}
-
-	// https://docs.sencha.com/gxt/4.x/guides/ui/fields/DateField.html
 
 	public String getDateAsString(int[] date) {
 		String dateAsString = "";

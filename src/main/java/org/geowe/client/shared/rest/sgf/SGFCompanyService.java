@@ -48,11 +48,20 @@ public interface SGFCompanyService {
 	@GET	
 	@Consumes("application/json")
 	@Path("/{id}/registered-points")
-	String getRegisteredPoint(@HeaderParam("Authorization") String authorization,
+	String getRegisteredPoints(@HeaderParam("Authorization") String authorization,
 			@PathParam("id") int id,
 			@QueryParam("imei")String imei,
 			@QueryParam("startdate")String startDate,
 			@QueryParam("enddate")String endDate,
+			@QueryParam("size")int size,
+			@QueryParam("sort")String sort);
+	
+	@GET	
+	@Consumes("application/json")
+	@Path("/{id}/registered-points")
+	String getLastRegisteredPoints(@HeaderParam("Authorization") String authorization,
+			@PathParam("id") int id,
+			@QueryParam("imei")String imei,			
 			@QueryParam("size")int size,
 			@QueryParam("sort")String sort);
 
