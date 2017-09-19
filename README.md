@@ -3,6 +3,8 @@ Adaptación del sig GeoWE para trabajar con información geográfica de vehícul
 
 ![Screenshot](https://github.com/geowe/sig-seguimiento-vehiculos/blob/master/screenshot.png)
 
+![Screenshot](https://github.com/geowe/sig-seguimiento-vehiculos/blob/master/screenshot.jpg)
+
 ## License
 
 The **geowe-core** is licensed under the [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html), meaning you can use it free of charge, according with license terms and conditions.
