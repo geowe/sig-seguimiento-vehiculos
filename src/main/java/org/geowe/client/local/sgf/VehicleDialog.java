@@ -215,6 +215,7 @@ public class VehicleDialog extends Dialog {
 				sb.appendHtmlConstant("<p style='margin: 5px 5px 10px'><b>"
 						+ UISgfMessages.INSTANCE.commentColumn() + ":</b> "
 						+ comment + "</p>");
+				
 			}
 		});
 	}
