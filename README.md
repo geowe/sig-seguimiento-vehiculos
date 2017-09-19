@@ -1,7 +1,7 @@
 # sig-seguimiento-vehículos
 Adaptación del sig GeoWE para trabajar con información geográfica de vehículos.
 
-![Screenshot](https://github.com/geowe/sig-seguimiento-vehiculos/blob/master/screenshot.jpg)
+![Screenshot](https://github.com/geowe/sig-seguimiento-vehiculos/blob/master/screenshot.png)
 
 ## License
 
