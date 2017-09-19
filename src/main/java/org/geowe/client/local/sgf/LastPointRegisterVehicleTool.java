@@ -23,7 +23,6 @@
 package org.geowe.client.local.sgf;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -37,10 +36,16 @@ import org.geowe.client.local.messages.UIMessages;
 import org.geowe.client.local.model.vector.VectorLayer;
 import org.geowe.client.local.model.vector.VectorLayerConfig;
 import org.geowe.client.local.model.vector.VectorLayerFactory;
+import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.geowe.client.local.ui.ProgressBarDialog;
+import org.geowe.client.shared.rest.sgf.SGFCompanyService;
+import org.geowe.client.shared.rest.sgf.SGFVehicleService;
+import org.geowe.client.shared.rest.sgf.model.jso.ActiveGPSJSO;
+import org.geowe.client.shared.rest.sgf.model.jso.CompanyJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.PointRegisterJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.PointRegisterListResponseJSO;
+import org.geowe.client.shared.rest.sgf.model.jso.SessionJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.VehicleJSO;
 import org.gwtopenmaps.openlayers.client.LonLat;
 import org.gwtopenmaps.openlayers.client.Style;
@@ -49,14 +54,18 @@ import org.gwtopenmaps.openlayers.client.feature.VectorFeature;
 import org.gwtopenmaps.openlayers.client.format.WKT;
 import org.gwtopenmaps.openlayers.client.geometry.Geometry;
 import org.gwtopenmaps.openlayers.client.geometry.Point;
+import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jboss.errai.common.client.api.tasks.ClientTaskManager;
+import org.jboss.errai.enterprise.client.jaxrs.api.RestClient;
+import org.jboss.errai.enterprise.client.jaxrs.api.RestErrorCallback;
 
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.resources.client.ImageResource;
 
 /**
- * Herramienta para trazar en el mapa la ruta de puntos GPS de un vehículo
+ * Herramienta para localizar en el mapa la última posición GPS registrada de un vehículo
  * 
  * @author jose@geowe.org
  * 
@@ -64,31 +73,37 @@ import com.google.gwt.resources.client.ImageResource;
 @ApplicationScoped
 public class LastPointRegisterVehicleTool extends LayerTool implements
 		VehicleButtonTool {
-	
-	private static final String LAYER_NAME = "Vehiculos";
+		
 	private static final String GPS_DEFAULT_PROJECTION = "EPSG:4326";
-	private static final String IMEI = "IMEI";
-	private static final String DATE = "FECHA";
-	private static final String TIME = "HORA";
-	private static final String SPEED = "VEL(Km/h)";
-	private static final String POSITION = "POSICION";
-	private static final String STREET = "CALLE";
-	private static final String NUMBER = "Nº";
-	private static final String LOCALITY = "LOCALIDAD";
-	private static final String PROVINCE = "PROVINCIA";
-	private static final String POSTAL_CODE = "CP";
-	private static final String COUNTRY = "PAIS";
+	private static final String LAYER_NAME = UISgfMessages.INSTANCE.vehicleLayerName();
+	private static final String IMEI = UISgfMessages.INSTANCE.imeiColumn();
+	private static final String DATE = UISgfMessages.INSTANCE.dateColumn();
+	private static final String TIME = UISgfMessages.INSTANCE.timeColumn();
+	private static final String SPEED = UISgfMessages.INSTANCE.speedColumn();
+	private static final String DATA = UISgfMessages.INSTANCE.dataColumn();
+	private static final String POSITION = UISgfMessages.INSTANCE.positionColumn();
+	private static final String DISTANCE = UISgfMessages.INSTANCE.distanceColumn();
+	private static final String STREET = UISgfMessages.INSTANCE.streetColumn();
+	private static final String NUMBER = UISgfMessages.INSTANCE.numberColumn();
+	private static final String LOCALITY = UISgfMessages.INSTANCE.localityColumn();
+	private static final String PROVINCE = UISgfMessages.INSTANCE.provinceColumn();
+	private static final String POSTAL_CODE = UISgfMessages.INSTANCE.postalCodeColumn();
+	private static final String COUNTRY = UISgfMessages.INSTANCE.countryColumn();
 
-	private static final String PLATE = "MATRICULA";
-	private static final String KM_REVISION = "KM REVI.";
-	private static final String LAST_REVISION = "ULT. REVI.";
-	private static final String COMMENT = "COMENTARIO";
-	private static final String STATUS = "ESTADO";
-	private static final String DATA = "DATOS";
+	private static final String PLATE = UISgfMessages.INSTANCE.plateColumn();
+	private static final String KM_REVISION = UISgfMessages.INSTANCE.kmForReviewColumn();
+	private static final String LAST_REVISION = UISgfMessages.INSTANCE.lastReviewColumn();
+	private static final String COMMENT = UISgfMessages.INSTANCE.commentColumn();
+	private static final String STATUS = UISgfMessages.INSTANCE.statusColumn();
+	
+	private SessionJSO session;
 
 	private List<VehicleJSO> vehicles;
 	private ProgressBarDialog autoMessageBox;
-
+	
+	@Inject
+	private SGFServiceInfo SGFServiceInfo;
+	
 	@Inject
 	private MessageDialogBuilder messageDialogBuilder;
 
@@ -104,7 +119,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 
 	@Override
 	public String getName() {
-		return "Último punto registrado";
+		return UISgfMessages.INSTANCE.lastRegisterPoint();
 	}
 
 	@Override
@@ -114,10 +129,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 
 	@Override
 	public void onClick() {
-		DateTimeFormat fmt = DateTimeFormat.getFormat("yyyy-MM-dd");
-		Date today = new Date();
 		
-		final String currentDate = fmt.format(today);
 		autoMessageBox = new ProgressBarDialog(false,
 				UIMessages.INSTANCE.processing());
 		autoMessageBox.show();
@@ -127,13 +139,83 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 			@Override
 			public void run() {
 				for (VehicleJSO vehicle : vehicles) {
-					createLastPointRegisterLayer(vehicle, currentDate);
+					
+					//PointRegisterJSO point = getSamplePoint(vehicle);
+					getPoint(vehicle);
 				}
-				autoMessageBox.hide();
+				
 			}
 		});
-
 	}
+			
+	private void getPoint(final VehicleJSO vehicle) {
+		
+		autoMessageBox.setProgressStatusMessage(UISgfMessages.INSTANCE.getIMEI());
+		
+		RestClient.create(SGFVehicleService.class, SGFServiceInfo.getURL(),
+				new RemoteCallback<String>() {
+
+					@Override
+					public void callback(String activeGPSResponseJson) {	
+						
+						ActiveGPSJSO activeGPS = JsonUtils.safeEval(activeGPSResponseJson);
+						CompanyJSO company = session.getCompany();
+						getRequestRegisteredPoint(session.getToken(), company.getId(), activeGPS.getImei(), vehicle);						
+					}
+				},
+
+				new RestErrorCallback() {
+					
+					@Override
+					public boolean error(Request message, Throwable throwable) {
+						autoMessageBox.hide();
+						messageDialogBuilder.createInfo(UIMessages.INSTANCE.edtAlertDialogTitle(),  UISgfMessages.INSTANCE.notGPSFound()).show();
+						
+						return false;
+					}
+				}, Response.SC_OK).getActiveGPSDevice(session.getToken(), vehicle.getId());
+		
+	}
+				
+	private void getRequestRegisteredPoint(String token, int companyId, final String imei, final VehicleJSO vehicle) {
+		autoMessageBox.setProgressStatusMessage(UISgfMessages.INSTANCE.getGPSData());
+		
+		RestClient.create(SGFCompanyService.class, SGFServiceInfo.getURL(),
+				new RemoteCallback<String>() {
+
+					@Override
+					public void callback(String pointRegisterListResponseJson) {	
+						
+						
+						PointRegisterListResponseJSO pointRegisterResponse = JsonUtils
+								.safeEval(pointRegisterListResponseJson);
+						PointRegisterJSO[] pointRegisters = pointRegisterResponse
+								.getPointRegisterListEmbededJSO().getPointRegister();
+						List<PointRegisterJSO> points = Arrays.asList(pointRegisters);
+						
+						if(points.isEmpty()) {
+							messageDialogBuilder.createInfo(UIMessages.INSTANCE.edtAlertDialogTitle(),  UISgfMessages.INSTANCE.gpsDataNotFound()).show();
+							return;
+						}
+						
+						createLastPointRegisterLayer(vehicle, points.get(0));						
+						autoMessageBox.hide();
+					}
+				},
+
+				new RestErrorCallback() {
+					
+					@Override
+					public boolean error(Request message, Throwable throwable) {
+						autoMessageBox.hide();
+						messageDialogBuilder.createInfo(UISgfMessages.INSTANCE.errorDetected(),  throwable.getMessage()).show();
+						
+						return false;
+					}
+				}, Response.SC_OK).getLastRegisteredPoints(token, vehicle.getId(), imei, 1, "date,desc");
+			
+	}
+		
 
 	public void setVehicles(List<VehicleJSO> vehicles) {
 		setEnabled(true);
@@ -141,7 +223,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 	}
 
 	private void createLastPointRegisterLayer(VehicleJSO vehicleJSO,
-			String dateToSearch) {
+			PointRegisterJSO point) {
 		VectorLayerConfig layerConfig = createVectorLayerConfig(vehicleJSO);
 
 		VectorLayer vehicleLayer = (VectorLayer) layerManagerWidget
@@ -155,16 +237,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 			removeLastPoint(vehicleLayer, vehicleJSO.getPlate());
 		}
 
-		PointRegisterJSO point = getSamplePoint(vehicleJSO);
-
-		if (point == null) {
-			messageDialogBuilder
-					.createInfo("Atención",
-							"No se encuentran datos registrados para la fecha especificada")
-					.show();
-			return;
-		}
-
+		
 		WKT reader = new WKT();
 
 		VectorFeature f = reader.read(point.getPosition())[0];
@@ -203,15 +276,8 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 		f.getAttributes()
 				.setAttribute(DATA, point.getDatos().replace(",", " "));
 
-//		String color = vehicleLayer.getVectorStyle().getFill().getNormalColor();
-//		vehicleLayer.getVectorStyle().getLine().setNormalColor(color);
-//		vehicleLayer.getVectorStyle().getLine().setThickness(3);
-		
-		
-		//vehicleLayer.redraw();
 		layerManagerWidget.setSelectedLayer(LayerManagerWidget.VECTOR_TAB,
 				vehicleLayer);
-		//geoMap.getMap().zoomToExtent(vehicleLayer.getDataExtent());
 		
 		g = f.getGeometry();
 		currentPoint = Point.narrowToPoint(g.getJSObject());
@@ -278,8 +344,6 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 		return point;
 	}
 
-	// https://docs.sencha.com/gxt/4.x/guides/ui/fields/DateField.html
-
 	public String getDateAsString(int[] date) {
 		String dateAsString = "";
 		if (date != null && date.length >= 3) {
@@ -334,5 +398,9 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 				.getSafeUri().asString());
 		style.setBackgroundOffset(0, -28);
 		return style;
+	}
+	
+	public void setSession(SessionJSO session) {
+		this.session = session;
 	}
 }

@@ -29,6 +29,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.geowe.client.shared.rest.sgf.model.jso.SessionJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.VehicleJSO;
 
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -94,5 +95,11 @@ public class VehicleToolBar extends ContentPanel {
 	public void setVehicles(List<VehicleJSO> vehicles) {
 		routeVehicleTool.setVehicles(vehicles);
 		lastPointRegisterVehicleTool.setVehicles(vehicles);
+	}
+	
+	public void setSession(SessionJSO session) {
+		routeVehicleTool.setSession(session);
+		lastPointRegisterVehicleTool.setSession(session);
+		
 	}
 }
