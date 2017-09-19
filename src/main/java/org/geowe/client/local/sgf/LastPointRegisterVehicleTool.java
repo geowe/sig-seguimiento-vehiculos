@@ -97,6 +97,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 	private static final String STATUS = UISgfMessages.INSTANCE.statusColumn();
 	
 	private SessionJSO session;
+
 	private List<VehicleJSO> vehicles;
 	private ProgressBarDialog autoMessageBox;
 	
@@ -243,7 +244,8 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 
 		Geometry g = f.getGeometry();
 		Point currentPoint = Point.narrowToPoint(g.getJSObject());
-		String position = currentPoint.getX() + " , " + currentPoint.getY();
+		String position = "lon: " + currentPoint.getX() + " lat: "
+				+ currentPoint.getY();
 
 		f.getGeometry().transform(layerConfig.getProjection(),
 				layerConfig.getDefaultProjection());
@@ -256,7 +258,6 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 		int speed = Double.valueOf(point.getSpeed()).intValue();
 
 		f.getAttributes().setAttribute(SPEED, speed);
-		f.getAttributes().setAttribute(DATA, point.getDatos());
 		f.getAttributes().setAttribute(POSITION, position);
 
 		f.getAttributes().setAttribute(STREET, point.getStreet());
@@ -271,6 +272,9 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 		f.getAttributes().setAttribute(LAST_REVISION, vehicleJSO.getLastRevisionDate());
 		f.getAttributes().setAttribute(COMMENT, vehicleJSO.getComments());
 		f.getAttributes().setAttribute(STATUS, vehicleJSO.getStatus());
+		// TODO: pendiente de modelar los datos
+		f.getAttributes()
+				.setAttribute(DATA, point.getDatos().replace(",", " "));
 
 		layerManagerWidget.setSelectedLayer(LayerManagerWidget.VECTOR_TAB,
 				vehicleLayer);
@@ -304,9 +308,9 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 			routeLayer.addAttribute(DATE, false);
 			routeLayer.addAttribute(TIME, false);
 			routeLayer.addAttribute(SPEED, false);
-			routeLayer.addAttribute(DATA, false);
+
 			routeLayer.addAttribute(POSITION, false);
-			routeLayer.addAttribute(DISTANCE, false);
+
 			routeLayer.addAttribute(STREET, false);
 			routeLayer.addAttribute(NUMBER, false);
 			routeLayer.addAttribute(LOCALITY, false);
@@ -318,6 +322,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 			routeLayer.addAttribute(LAST_REVISION, false);
 			routeLayer.addAttribute(COMMENT, false);
 			routeLayer.addAttribute(STATUS, false);
+			routeLayer.addAttribute(DATA, false);
 
 		} catch (Exception e) {
 			messageDialogBuilder.createInfo("Error", e.getMessage()).show();
