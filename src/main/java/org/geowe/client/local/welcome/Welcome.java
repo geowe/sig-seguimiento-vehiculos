@@ -30,10 +30,12 @@ import org.geowe.client.local.initializer.URLVectorLayerInitializer;
 import org.geowe.client.local.main.AnchorBuilder;
 import org.geowe.client.local.messages.UIMessages;
 import org.geowe.client.local.sgf.SGFLoginServiceProxy;
+import org.geowe.client.local.ui.KeyShortcutHandler;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.slf4j.Logger;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
@@ -44,6 +46,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.sencha.gxt.core.client.XTemplates;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
+import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.form.PasswordField;
@@ -90,19 +93,24 @@ public class Welcome {
 			welcomeDialog.setBodyStyleName("pad-text");
 			welcomeDialog.getBody().addClassName("pad-text");
 			welcomeDialog.add(getPanel(getHtml()));
-			welcomeDialog.getButton(PredefinedButton.OK).addSelectHandler(
+			
+			TextButton okButton = welcomeDialog.getButton(PredefinedButton.OK);
+			KeyShortcutHandler keyShortcut = new KeyShortcutHandler(okButton,
+					KeyCodes.KEY_ENTER);
+			
+			passwordField.addKeyDownHandler(keyShortcut);
+			
+			okButton.addSelectHandler(
 					new SelectHandler() {
 						@Override
 						public void onSelect(final SelectEvent event) {
 							if(isEmptyCredential()) {
-								messageDialogBuilder.createInfo("Atención", "Debe rellenar las credenciales correctamente").show();
+								messageDialogBuilder.createInfo(UIMessages.INSTANCE.warning(),
+										"Debe rellenar las credenciales correctamente").show();
 								return;
 							}
 							
-							
-							
 							uRLVectorLayerInitializer.createLayerFromURL();
-							logger.info("ok pressed...");
 							progressImage.setVisible(true);
 
 							String userName = userNameField.getText();
@@ -112,9 +120,12 @@ public class Welcome {
 						}
 					});
 		}
-
+		
+		
+		
 		welcomeDialog.show();
 	}
+	
 	
 	private boolean isEmptyCredential() {
 		boolean isEmpty = false;
@@ -156,6 +167,7 @@ public class Welcome {
 		userNameField.setEmptyText(UIMessages.INSTANCE.gitHubUserNameField());
 		userNameField.setWidth(120);
 		userNameField.setAllowBlank(false);
+		userNameField.focus();
 		panel.add(userNameField);
 
 		passwordField = new PasswordField();
