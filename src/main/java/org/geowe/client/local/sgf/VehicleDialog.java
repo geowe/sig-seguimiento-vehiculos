@@ -201,13 +201,21 @@ public class VehicleDialog extends Dialog {
 	}
 	
 	private RowExpander<VehicleJSO> createRowExpander() {
+		
 		return new RowExpander<VehicleJSO>(new AbstractCell<VehicleJSO>() {
 			@Override
 			public void render(Context context, VehicleJSO value,
 					SafeHtmlBuilder sb) {
+				
+				String comment = value.getComments();
+				if( comment == null) {
+					comment = UISgfMessages.INSTANCE.noCommentLabel();
+				}
+				
 				sb.appendHtmlConstant("<p style='margin: 5px 5px 10px'><b>"
 						+ UISgfMessages.INSTANCE.commentColumn() + ":</b> "
-						+ value.getComments().replaceAll("null", UISgfMessages.INSTANCE.noCommentLabel()) + "</p>");
+						+ comment + "</p>");
+				
 			}
 		});
 	}
