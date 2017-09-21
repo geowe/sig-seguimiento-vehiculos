@@ -56,6 +56,8 @@ import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.RowExpander;
+import com.sencha.gxt.widget.core.client.grid.filters.GridFilters;
+import com.sencha.gxt.widget.core.client.grid.filters.StringFilter;
 import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent;
 import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent.SelectionChangedHandler;
 
@@ -77,6 +79,7 @@ public class VehicleDialog extends Dialog {
 	private TextField companyCifField;	
 	private ListStore<VehicleJSO> vehicleStore;
 	private static final VehicleJSOProperties vehicleProps = GWT.create(VehicleJSOProperties.class);
+	private Grid<VehicleJSO> vehiculeGrid;
 	
 	public VehicleDialog() {
 		super();
@@ -100,6 +103,7 @@ public class VehicleDialog extends Dialog {
 		vPanel.setPixelSize(490, 420);
 		vPanel.setSpacing(5);		
 		vPanel.add(createCompanyPanel());
+		
 		vPanel.add(createGridPanel());
 		
 		return vPanel;
@@ -147,7 +151,7 @@ public class VehicleDialog extends Dialog {
 		hPanel.setSize("510px", "320px");
 		
 		vehicleStore = new ListStore<VehicleJSO>(vehicleProps.key());
-		Grid<VehicleJSO> vehiculeGrid = createGrid(vehicleStore, vehicleProps);
+		vehiculeGrid = createGrid(vehicleStore, vehicleProps);
 		
 		vehiculeGrid.getSelectionModel().addSelectionChangedHandler(
 				new SelectionChangedHandler<VehicleJSO>() {
@@ -169,8 +173,9 @@ public class VehicleDialog extends Dialog {
 	}
 
 	public void setVehicle(List<VehicleJSO> vehicles) {
-		vehicleStore.clear();
-		vehicleStore.addAll(vehicles);
+		vehicleStore.clear();		
+		vehicleStore.addAll(vehicles);		
+		vehiculeGrid.getView().refresh(true);
 	}
 		
 	public void setSession(SessionJSO session) {
@@ -185,9 +190,15 @@ public class VehicleDialog extends Dialog {
 	private Grid<VehicleJSO> createGrid(ListStore<VehicleJSO> dataStore,
 			VehicleJSOProperties properties) {
 		
+		StringFilter<VehicleJSO> plateFilter = new StringFilter<VehicleJSO>(properties.plate());
+		StringFilter<VehicleJSO> nameFilter = new StringFilter<VehicleJSO>(properties.name());
+		GridFilters<VehicleJSO> filters = new GridFilters<VehicleJSO>();
+		
+		
 		RowExpander<VehicleJSO> rowExpander = createRowExpander();
 		ColumnModel<VehicleJSO> columnModel = createColumnList(properties, rowExpander);
-		Grid<VehicleJSO> grid = new Grid<VehicleJSO>(dataStore, columnModel);				
+		Grid<VehicleJSO> grid = new Grid<VehicleJSO>(dataStore, columnModel);		
+		
 		grid.setBorders(true);
 		grid.getView().setForceFit(true);				
 		grid.getView().setAutoExpandColumn(columnModel.getColumn(2));
@@ -196,6 +207,11 @@ public class VehicleDialog extends Dialog {
 		grid.setBorders(true);
 		grid.setColumnReordering(true);
 		rowExpander.initPlugin(grid);	
+		
+		filters.initPlugin(grid);
+		filters.setLocal(true);		 
+		filters.addFilter(nameFilter);
+		filters.addFilter(plateFilter);
 		
 		return grid;
 	}
@@ -226,6 +242,12 @@ public class VehicleDialog extends Dialog {
 		rowExpander.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		rowExpander.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		
+		ColumnConfig<VehicleJSO, String> nameColumn = new ColumnConfig<VehicleJSO, String>(
+				props.name(), 200, SafeHtmlUtils.fromTrustedString("<b>"
+						+ UISgfMessages.INSTANCE.nameColumn() + "</b>"));
+		
+		nameColumn.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		
 		
 		ColumnConfig<VehicleJSO, String> plateColumn = new ColumnConfig<VehicleJSO, String>(
 				props.plate(), 200, SafeHtmlUtils.fromTrustedString("<b>"
@@ -251,6 +273,7 @@ public class VehicleDialog extends Dialog {
 				
 		List<ColumnConfig<VehicleJSO, ?>> columns = new ArrayList<ColumnConfig<VehicleJSO, ?>>();
 		columns.add(rowExpander);
+		columns.add(nameColumn);
 		columns.add(plateColumn);
 		columns.add(statusColumn);	
 		columns.add(lastRevisionDateColumn);

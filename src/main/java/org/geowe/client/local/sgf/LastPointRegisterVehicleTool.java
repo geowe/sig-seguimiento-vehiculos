@@ -43,6 +43,7 @@ import org.geowe.client.shared.rest.sgf.SGFCompanyService;
 import org.geowe.client.shared.rest.sgf.SGFVehicleService;
 import org.geowe.client.shared.rest.sgf.model.jso.ActiveGPSJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.CompanyJSO;
+import org.geowe.client.shared.rest.sgf.model.jso.DataJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.PointRegisterJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.PointRegisterListResponseJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.SessionJSO;
@@ -76,7 +77,8 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 		
 	private static final String GPS_DEFAULT_PROJECTION = "EPSG:4326";
 	private static final String LAYER_NAME = UISgfMessages.INSTANCE.vehicleLayerName();
-	private static final String IMEI = UISgfMessages.INSTANCE.imeiColumn();
+	//private static final String IMEI = UISgfMessages.INSTANCE.imeiColumn();
+	private static final String NAME = UISgfMessages.INSTANCE.nameColumn();
 	private static final String DATE = UISgfMessages.INSTANCE.dateColumn();
 	private static final String TIME = UISgfMessages.INSTANCE.timeColumn();
 	private static final String SPEED = UISgfMessages.INSTANCE.speedColumn();
@@ -95,6 +97,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 	private static final String LAST_REVISION = UISgfMessages.INSTANCE.lastReviewColumn();
 	private static final String COMMENT = UISgfMessages.INSTANCE.commentColumn();
 	private static final String STATUS = UISgfMessages.INSTANCE.statusColumn();
+	private static final String ACTIVE = UISgfMessages.INSTANCE.activeColumn();
 	
 	private SessionJSO session;
 
@@ -252,12 +255,12 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 
 		vehicleLayer.addFeature(f);
 
-		f.getAttributes().setAttribute(IMEI, point.getImei());
+		//f.getAttributes().setAttribute(IMEI, point.getImei());
+		f.getAttributes().setAttribute(NAME, "Sin nombre");
+		f.getAttributes().setAttribute(PLATE, vehicleJSO.getPlate());
 		f.getAttributes().setAttribute(DATE, getDateAsString(point.getDate()));
 		f.getAttributes().setAttribute(TIME, getTimeAsString(point.getDate()));
-		int speed = Double.valueOf(point.getSpeed()).intValue();
-
-		f.getAttributes().setAttribute(SPEED, speed);
+		
 		f.getAttributes().setAttribute(POSITION, position);
 
 		f.getAttributes().setAttribute(STREET, point.getStreet());
@@ -267,14 +270,35 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 		f.getAttributes().setAttribute(POSTAL_CODE, point.getPostalCode());
 		f.getAttributes().setAttribute(COUNTRY, point.getCountry());
 		
-		f.getAttributes().setAttribute(PLATE, vehicleJSO.getPlate());
-		f.getAttributes().setAttribute(KM_REVISION, vehicleJSO.getKmsLeftForRevision());
-		f.getAttributes().setAttribute(LAST_REVISION, vehicleJSO.getLastRevisionDate());
-		f.getAttributes().setAttribute(COMMENT, vehicleJSO.getComments());
-		f.getAttributes().setAttribute(STATUS, vehicleJSO.getStatus());
-		// TODO: pendiente de modelar los datos
-		f.getAttributes()
-				.setAttribute(DATA, point.getDatos().replace(",", " "));
+		//int speed = Double.valueOf(point.getSpeed()).intValue();
+
+		//f.getAttributes().setAttribute(SPEED, speed);
+		//f.getAttributes().setAttribute(KM_REVISION, vehicleJSO.getKmsLeftForRevision());
+		//f.getAttributes().setAttribute(LAST_REVISION, vehicleJSO.getLastRevisionDate());
+		//f.getAttributes().setAttribute(COMMENT, vehicleJSO.getComments());
+		
+		String active = "NO";
+		if("ACTIVE".equals(vehicleJSO.getStatus())) {
+			active = UISgfMessages.INSTANCE.yesValue();
+		}
+		
+		f.getAttributes().setAttribute(ACTIVE, active);
+		
+		DataJSO data = JsonUtils.safeEval(point.getDatos());
+		
+		String[]dataArray =  data.getData().split(",");			
+		String statusValue = dataArray[0];
+		String status = UISgfMessages.INSTANCE.stoppedValue(); // 1=0
+		
+		if("1=1".equals(statusValue)) {
+			status = UISgfMessages.INSTANCE.marchingValue();
+		}
+		
+
+		f.getAttributes().setAttribute(STATUS, status); //PARADA/MARCHA
+		
+//		f.getAttributes()
+//				.setAttribute(DATA, point.getDatos().replace(",", " "));
 
 		layerManagerWidget.setSelectedLayer(LayerManagerWidget.VECTOR_TAB,
 				vehicleLayer);
@@ -303,26 +327,32 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 		try {
 
 			routeLayer = VectorLayerFactory.createEmptyVectorLayer(layerConfig);
+			routeLayer.addAttribute(NAME, false);
 			routeLayer.addAttribute(PLATE, false);
-			routeLayer.addAttribute(IMEI, false);
+			//routeLayer.addAttribute(IMEI, false);
 			routeLayer.addAttribute(DATE, false);
 			routeLayer.addAttribute(TIME, false);
-			routeLayer.addAttribute(SPEED, false);
-
-			routeLayer.addAttribute(POSITION, false);
-
 			routeLayer.addAttribute(STREET, false);
 			routeLayer.addAttribute(NUMBER, false);
 			routeLayer.addAttribute(LOCALITY, false);
 			routeLayer.addAttribute(PROVINCE, false);
 			routeLayer.addAttribute(POSTAL_CODE, false);
 			routeLayer.addAttribute(COUNTRY, false);
-			
-			routeLayer.addAttribute(KM_REVISION, false);
-			routeLayer.addAttribute(LAST_REVISION, false);
-			routeLayer.addAttribute(COMMENT, false);
 			routeLayer.addAttribute(STATUS, false);
-			routeLayer.addAttribute(DATA, false);
+			routeLayer.addAttribute(ACTIVE, false);
+			routeLayer.addAttribute(POSITION, false);
+			
+//			routeLayer.addAttribute(SPEED, false);
+//			routeLayer.addAttribute(KM_REVISION, false);
+//			routeLayer.addAttribute(LAST_REVISION, false);
+//			routeLayer.addAttribute(COMMENT, false);
+			
+			//routeLayer.addAttribute(DATA, false);
+			
+			
+			
+			
+			//NOMBRE-MATRÍCULA- FECHA-HORA-CALLE-Nº-LOCALIDAD-PROVINCIA-CP-PAIS-ESTADO(PARADO/MARCHA-ACTIVO(SI/NO)-POSICION
 
 		} catch (Exception e) {
 			messageDialogBuilder.createInfo("Error", e.getMessage()).show();
