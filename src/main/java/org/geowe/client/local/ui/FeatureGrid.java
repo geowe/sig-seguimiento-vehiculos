@@ -35,6 +35,8 @@ import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
+import com.sencha.gxt.widget.core.client.grid.filters.GridFilters;
+import com.sencha.gxt.widget.core.client.grid.filters.StringFilter;
 
 /**
  * Componente gráfico que representa una tabla con todos los datos
@@ -81,7 +83,7 @@ public class FeatureGrid extends Grid<VectorFeature> {
 	}
 	
 	public boolean isEnableCellRender() {
-		return enableCellRender;
+		return false;//enableCellRender;
 	}
 
 	public void setEnableCellRender(boolean enableCellRender) {
@@ -149,11 +151,20 @@ public class FeatureGrid extends Grid<VectorFeature> {
 					ColumnConfig<VectorFeature, String> attributeColumn = new ColumnConfig<VectorFeature, String>(
 							attributeProvider, 100, attributeName);
 					attributeColumn.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-					if(isEnableCellRender()) {
-						attributeColumn.setCell(new FeatureGridCellRenderer());
-					}					
+//					if(isEnableCellRender()) {
+//						attributeColumn.setCell(new FeatureGridCellRenderer());
+//					}					
 					
 					columns.add(attributeColumn);
+					
+					//ValueProvider<? super VectorFeature, Object> vp = grid.getEditableGrid().getColumnModel().getValueProvider(0);
+					//StringFilter<VectorFeature> plateFilter = new StringFilter<VectorFeature>(vp.getValue(object));
+					StringFilter<VectorFeature> plateFilter = new StringFilter<VectorFeature>(attributeProvider);
+					
+					GridFilters<VectorFeature> filters = new GridFilters<VectorFeature>();
+					filters.initPlugin(this);
+					filters.setLocal(true);		 
+					filters.addFilter(plateFilter);
 				}
 			}					
 		}

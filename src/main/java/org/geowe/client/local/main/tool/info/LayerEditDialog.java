@@ -43,6 +43,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.core.client.resources.ThemeStyles;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.widget.core.client.Dialog;
@@ -55,6 +56,9 @@ import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.Verti
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.form.FieldLabel;
+import com.sencha.gxt.widget.core.client.grid.GridViewConfig;
+import com.sencha.gxt.widget.core.client.grid.filters.GridFilters;
+import com.sencha.gxt.widget.core.client.grid.filters.StringFilter;
 import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent;
 import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent.SelectionChangedHandler;
 import com.sencha.gxt.widget.core.client.tips.ToolTipConfig;
@@ -149,7 +153,29 @@ public class LayerEditDialog extends Dialog {
 		pagingToolBar.setBorders(false);		
 		
 		grid = new EditingFeatureGrid(pagingToolBar);
-		grid.setEnableCellRender(true);
+		//grid.getEditableGrid().getView().getViewConfig().
+		
+		 grid.getEditableGrid().getView().setViewConfig(new GridViewConfig() {
+//		      public String getRowStyle(ModelData model, int rowIndex, ListStore<ModelData> ds) {
+//		        return "my-row-style"; // Your css style with your background color.
+//		      }
+
+			@Override
+			public String getColStyle(Object model,
+					ValueProvider valueProvider, int rowIndex, int colIndex) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public String getRowStyle(Object model, int rowIndex) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		    });
+		
+		
+		grid.setEnableCellRender(false);
 		grid.getFeatureGrid().getSelectionModel().addSelectionChangedHandler(
 				new SelectionChangedHandler<VectorFeature>() {
 					@Override

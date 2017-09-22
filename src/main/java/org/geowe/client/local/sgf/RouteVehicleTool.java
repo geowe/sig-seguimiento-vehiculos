@@ -294,7 +294,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 
 			routeLayer.addFeature(f);
 
-			f.getAttributes().setAttribute(NAME, "sin nombre");
+			f.getAttributes().setAttribute(NAME, vehicleJSO.getName());
 			
 			f.getAttributes().setAttribute(PLATE, vehicleJSO.getPlate());
 			f.getAttributes().setAttribute(DATE,
@@ -358,7 +358,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 		final VectorFeature lineFeature = new VectorFeature(line);
 		routeLayer.addFeature(lineFeature);
 		
-		lineFeature.getAttributes().setAttribute(NAME, "sin nombre");
+		lineFeature.getAttributes().setAttribute(NAME, vehicleJSO.getName());
 		lineFeature.getAttributes().setAttribute(PLATE, vehicleJSO.getPlate());
 		lineFeature.getAttributes().setAttribute(DATE, date);
 		lineFeature.getAttributes().setAttribute(SPEED,

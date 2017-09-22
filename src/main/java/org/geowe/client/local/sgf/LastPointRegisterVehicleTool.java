@@ -256,7 +256,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 		vehicleLayer.addFeature(f);
 
 		//f.getAttributes().setAttribute(IMEI, point.getImei());
-		f.getAttributes().setAttribute(NAME, "Sin nombre");
+		f.getAttributes().setAttribute(NAME, vehicleJSO.getName());
 		f.getAttributes().setAttribute(PLATE, vehicleJSO.getPlate());
 		f.getAttributes().setAttribute(DATE, getDateAsString(point.getDate()));
 		f.getAttributes().setAttribute(TIME, getTimeAsString(point.getDate()));

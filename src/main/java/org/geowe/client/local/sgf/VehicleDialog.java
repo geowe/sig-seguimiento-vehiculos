@@ -30,6 +30,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.geowe.client.local.ImageProvider;
+import org.geowe.client.local.main.tool.info.EditLayerDataTool;
 import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.geowe.client.shared.rest.sgf.model.jso.CompanyJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.SessionJSO;
@@ -75,6 +76,8 @@ public class VehicleDialog extends Dialog {
 	private Logger logger;
 	@Inject
 	private VehicleToolBar vehicleToolBar;	
+	@Inject
+	private EditLayerDataTool editLayerDataTool;
 	private TextField companyNameField;
 	private TextField companyCifField;	
 	private ListStore<VehicleJSO> vehicleStore;
@@ -136,11 +139,13 @@ public class VehicleDialog extends Dialog {
 	private VerticalPanel getCompanyCifPanel() {
 		VerticalPanel vPanel = new VerticalPanel();
 		vPanel.setSpacing(5);
-		companyCifField = new TextField();
-		companyCifField.setEnabled(false);
-		companyCifField.setWidth(FIELD_WIDTH);
-		vPanel.add(new Label(UISgfMessages.INSTANCE.cifLabel()));
-		vPanel.add(companyCifField);
+//		companyCifField = new TextField();
+//		companyCifField.setEnabled(false);
+//		companyCifField.setWidth(FIELD_WIDTH);
+//		vPanel.add(new Label(UISgfMessages.INSTANCE.cifLabel()));		
+//		vPanel.add(companyCifField);
+		vPanel.add(editLayerDataTool);
+		
 		
 		return vPanel;
 		
@@ -182,7 +187,7 @@ public class VehicleDialog extends Dialog {
 		
 		CompanyJSO company = session.getCompany();
 		this.companyNameField.setText(company.getName());
-		this.companyCifField.setText(company.getCif());
+		//this.companyCifField.setText(company.getCif());
 		
 		vehicleToolBar.setSession(session);
 	}
