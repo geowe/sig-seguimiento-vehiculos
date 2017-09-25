@@ -23,6 +23,7 @@
 package org.geowe.client.local.main.tool.search;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -100,6 +101,10 @@ public class ExportCSVLayerTool extends LayerTool implements FeatureTool {
 	public void onClick() {
 		if (selectedFeatures != null) {
 			FileExporter.saveAs(exportCSV(selectedFeatures), layer.getName()
+					+ ".csv");
+		}
+		else {
+			FileExporter.saveAs(exportCSV(Arrays.asList(layer.getFeatures())), layer.getName()
 					+ ".csv");
 		}
 	}

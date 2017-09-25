@@ -27,6 +27,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.New;
 import javax.inject.Inject;
 
 import org.geowe.client.local.ImageProvider;
@@ -76,7 +77,7 @@ public class VehicleDialog extends Dialog {
 	private Logger logger;
 	@Inject
 	private VehicleToolBar vehicleToolBar;	
-	@Inject
+	@Inject	
 	private EditLayerDataTool editLayerDataTool;
 	private TextField companyNameField;
 	private TextField companyCifField;	
@@ -144,6 +145,7 @@ public class VehicleDialog extends Dialog {
 //		companyCifField.setWidth(FIELD_WIDTH);
 //		vPanel.add(new Label(UISgfMessages.INSTANCE.cifLabel()));		
 //		vPanel.add(companyCifField);
+		vPanel.add(new Label(""));	
 		vPanel.add(editLayerDataTool);
 		
 		

@@ -32,3 +32,15 @@ div.olControlAttribution {
 	margin-top: -150px;
 	padding: 5px;
 }
+
+.grid-rowStopped  {
+  background-color: #FF0000 !important;
+}
+
+.grid-rowMarching  {
+  background-color: #00FF00 !important;
+}
+
+.grid-rowRoute  {
+  background-color: yellow !important;
+}

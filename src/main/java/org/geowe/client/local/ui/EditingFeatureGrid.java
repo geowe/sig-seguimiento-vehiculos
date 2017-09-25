@@ -65,7 +65,7 @@ public class EditingFeatureGrid extends GridInlineEditing<VectorFeature> {
 	 */
 	public void rebuild(List<VectorFeature> features) {
 		getFeatureGrid().rebuild(features);
-		setGridEditors();
+		//setGridEditors();
 	}
 	
 	/**
@@ -75,7 +75,7 @@ public class EditingFeatureGrid extends GridInlineEditing<VectorFeature> {
 	 */
 	public void rebuild(VectorFeature[] vectorFeatures) {
 		getFeatureGrid().rebuild(vectorFeatures);
-		setGridEditors();
+		//setGridEditors();
 	}
 	
 	/**
@@ -134,13 +134,13 @@ public class EditingFeatureGrid extends GridInlineEditing<VectorFeature> {
 		getFeatureGrid().setEnableCellRender(enableCellRender);
 	}
 	
-	private void setGridEditors() {
-		ColumnModel<VectorFeature> columnModel = getFeatureGrid().getColumnModel();
-				
-		for(ColumnConfig<VectorFeature, ?> column : columnModel.getColumns()) {
-			if(!column.isHidden()) {
-				this.addEditor((ColumnConfig<VectorFeature, String>)column, new TextField());				
-			}
-		}			
-	}	
+//	private void setGridEditors() {
+//		ColumnModel<VectorFeature> columnModel = getFeatureGrid().getColumnModel();
+//				
+//		for(ColumnConfig<VectorFeature, ?> column : columnModel.getColumns()) {
+//			if(!column.isHidden()) {
+//				this.addEditor((ColumnConfig<VectorFeature, String>)column, new TextField());				
+//			}
+//		}			
+//	}	
 }

@@ -26,13 +26,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.gwtopenmaps.openlayers.client.feature.VectorFeature;
 
+import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.loader.DataProxy;
 import com.sencha.gxt.data.shared.loader.LoadResultListStoreBinding;
 import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
 import com.sencha.gxt.data.shared.loader.PagingLoadResult;
 import com.sencha.gxt.data.shared.loader.PagingLoader;
+import com.sencha.gxt.widget.core.client.grid.GridViewConfig;
 import com.sencha.gxt.widget.core.client.toolbar.PagingToolBar;
 
 /**
@@ -66,6 +69,32 @@ public class PagingFeatureGrid extends FeatureGrid {
 	
 	public PagingFeatureGrid(PagingToolBar toolBar) {
 		this(DEFAULT_WIDTH, DEFAULT_HEIGHT, toolBar);
+		getView().setViewConfig(new GridViewConfig<VectorFeature>() {
+
+		    @Override
+		    public String getColStyle(  VectorFeature model, 
+		                                ValueProvider<? super VectorFeature, ?> valueProvider,
+		                                int rowIndex, int colIndex)
+		    {
+		        if (UISgfMessages.INSTANCE
+						.marchingValue().equals(model.getAttributes().getAttributeAsString(UISgfMessages.INSTANCE
+						.statusColumn()))){
+		            return "background-color: green; font-weight: bold;";
+		        }else {
+		            return "background-color:red; font-weight: normal;";
+		        }
+		        
+		    }
+
+		    @Override
+		    public String getRowStyle(VectorFeature model, int rowIndex) {
+		        
+		        if(rowIndex == 1) {
+		        	return "background-color:yellow; font-weight: normal;";
+		        }
+		        return null;
+		    }
+		});
 	}
 
 	@Override
