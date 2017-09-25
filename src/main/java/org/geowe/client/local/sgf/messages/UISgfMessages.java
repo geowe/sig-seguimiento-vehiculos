@@ -9,6 +9,8 @@ public interface UISgfMessages extends Messages {
 	
 	String authError();
 	
+	String emptyCredentials();
+	
 	String getIMEI();
 	
 	String notGPSFound();

@@ -22,6 +22,7 @@
  */
 package org.geowe.client.local.main.tool.info;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -74,7 +75,7 @@ import com.sencha.gxt.widget.core.client.toolbar.PagingToolBar;
  *
  */
 @ApplicationScoped
-public class LayerEditDialog extends Dialog implements ChangeSelectedLayerListener{
+public class LayerEditDialog extends Dialog implements ChangeSelectedLayerListener {
 	public static final int HORIZONTAL_MARGIN = 50;
 	public static final int ROW_SIZE = 32;
 	public static final int VISIBLE_ROWS = 15;
@@ -104,10 +105,8 @@ public class LayerEditDialog extends Dialog implements ChangeSelectedLayerListen
 
 	public void setSelectedLayer(VectorLayer layer) {
 		if (layer != null) {
-			String previousName = this.selectedLayer != null ? this.selectedLayer
-					.getName() : "";
-			boolean changedLayer = !layer.getName().equalsIgnoreCase(
-					previousName);
+			String previousName = this.selectedLayer != null ? this.selectedLayer.getName() : "";
+			boolean changedLayer = !layer.getName().equalsIgnoreCase(previousName);
 			this.selectedLayer = layer;
 
 			VectorFeature[] features = getLayerFeatures();
@@ -120,23 +119,30 @@ public class LayerEditDialog extends Dialog implements ChangeSelectedLayerListen
 				grid.update(features);
 			}
 
-//			setHeadingText(UIMessages.INSTANCE.lidHeadText() + ": "
-//					+ selectedLayer.getName());
-			
-			setHeadingText(UIMessages.INSTANCE.layerInfoToolText() + ": "
-					+ selectedLayer.getName());
+			// setHeadingText(UIMessages.INSTANCE.lidHeadText() + ": "
+			// + selectedLayer.getName());
+
+			setHeadingText(UIMessages.INSTANCE.layerInfoToolText() + ": " + selectedLayer.getName());
+		} else {
+			this.selectedLayer = null;
+			setHeadingText(UIMessages.INSTANCE.layerInfoToolText() + ": " + "");
+
+			VectorFeature[] features = new VectorFeature[0];
+			pageSize.reset(features.length);
+			pageSize.setValue(pageSize.getMaxValue());
+			pagingToolBar.setPageSize(pageSize.getValue());
+			grid.rebuild(features);
 		}
 	}
 
 	private VectorFeature[] getLayerFeatures() {
-		return this.selectedLayer.getFeatures() != null ? this.selectedLayer
-				.getFeatures() : new VectorFeature[0];
+		return this.selectedLayer.getFeatures() != null ? this.selectedLayer.getFeatures() : new VectorFeature[0];
 	}
 
 	@PostConstruct
 	private void initialize() {
 		add(createPanel());
-		//addButtonHandlers();
+		// addButtonHandlers();
 		/**
 		 * Es necesario mostrar durante un instante el diálogo para que la
 		 * configuración del tamaño y del grid se realice correctamente
@@ -152,91 +158,79 @@ public class LayerEditDialog extends Dialog implements ChangeSelectedLayerListen
 	private int computeHeight() {
 		return VISIBLE_ROWS * ROW_SIZE;
 	}
-	
-		
 
 	private Widget createPanel() {
 		pagingToolBar = new PagingToolBar(VISIBLE_ROWS);
 		pagingToolBar.setBorders(false);
 
 		grid = new EditingFeatureGrid(pagingToolBar);
-		
-		
-		
-		
-//		
+
 		grid.getEditableGrid().getView().setViewConfig(new GridViewConfig<VectorFeature>() {
 
-		    @Override
-		    public String getColStyle(  VectorFeature model, 
-		                                ValueProvider<? super VectorFeature, ?> valueProvider,
-		                                int rowIndex, int colIndex)
-		    {
-		        if (UISgfMessages.INSTANCE
-						.marchingValue().equals(model.getAttributes().getAttributeAsString(UISgfMessages.INSTANCE
-						.statusColumn()))){
-		            return "grid-rowMarching";
-		        }else if (UISgfMessages.INSTANCE
-						.stoppedValue().equals(model.getAttributes().getAttributeAsString(UISgfMessages.INSTANCE
-						.statusColumn()))){
-		            return "grid-rowStopped";
-		        }
-		        else {		
-		        	return "grid-rowRoute";
-		        	
-		        }
-		    }
+			@Override
+			public String getColStyle(VectorFeature model, ValueProvider<? super VectorFeature, ?> valueProvider,
+					int rowIndex, int colIndex) {
+				if (UISgfMessages.INSTANCE.marchingValue()
+						.equals(model.getAttributes().getAttributeAsString(UISgfMessages.INSTANCE.statusColumn()))) {
+					return "grid-rowMarching";
+				} else if (UISgfMessages.INSTANCE.stoppedValue()
+						.equals(model.getAttributes().getAttributeAsString(UISgfMessages.INSTANCE.statusColumn()))) {
+					return "grid-rowStopped";
+				} else {
+					return "grid-rowRoute";
 
-		    @Override
-		    public String getRowStyle(VectorFeature model, int rowIndex) {
-		        return null;
-		    }
+				}
+			}
+
+			@Override
+			public String getRowStyle(VectorFeature model, int rowIndex) {
+				return null;
+			}
 		});
 
 		// grid.getEditableGrid().getView().getViewConfig().
 
-//		grid.getEditableGrid().getView().setViewConfig(new GridViewConfig() {
-//		
-//
-//			@Override
-//			public String getColStyle(Object model,
-//					ValueProvider valueProvider, int rowIndex, int colIndex) {
-//				String color = "blue-row";//"FF0000";
-//				VectorFeature vf = (VectorFeature) model;
-//				String statusValue = vf.getAttributes().getAttributeAsString(UISgfMessages.INSTANCE
-//						.statusColumn());
-//				if (UISgfMessages.INSTANCE.marchingValue()
-//						.equals(statusValue)) {
-//					color = "green-row";//"00FF00";
-//				}
-//				return color;
-//			}
-//
-//			@Override
-//			public String getRowStyle(Object model, int rowIndex) {
-//				String color = "red-row";//"FF0000";
-//				VectorFeature vf = (VectorFeature) model;
-//				String statusValue = vf.getAttributes().getAttributeAsString(UISgfMessages.INSTANCE
-//						.statusColumn());
-//				if (UISgfMessages.INSTANCE.marchingValue()
-//						.equals(statusValue)) {
-//					color = "green-row";//"00FF00";
-//				}
-//				return color;
-//			}
-//		});
+		// grid.getEditableGrid().getView().setViewConfig(new GridViewConfig() {
+		//
+		//
+		// @Override
+		// public String getColStyle(Object model,
+		// ValueProvider valueProvider, int rowIndex, int colIndex) {
+		// String color = "blue-row";//"FF0000";
+		// VectorFeature vf = (VectorFeature) model;
+		// String statusValue =
+		// vf.getAttributes().getAttributeAsString(UISgfMessages.INSTANCE
+		// .statusColumn());
+		// if (UISgfMessages.INSTANCE.marchingValue()
+		// .equals(statusValue)) {
+		// color = "green-row";//"00FF00";
+		// }
+		// return color;
+		// }
+		//
+		// @Override
+		// public String getRowStyle(Object model, int rowIndex) {
+		// String color = "red-row";//"FF0000";
+		// VectorFeature vf = (VectorFeature) model;
+		// String statusValue =
+		// vf.getAttributes().getAttributeAsString(UISgfMessages.INSTANCE
+		// .statusColumn());
+		// if (UISgfMessages.INSTANCE.marchingValue()
+		// .equals(statusValue)) {
+		// color = "green-row";//"00FF00";
+		// }
+		// return color;
+		// }
+		// });
 
 		grid.setEnableCellRender(false);
-		grid.getFeatureGrid()
-				.getSelectionModel()
-				.addSelectionChangedHandler(
-						new SelectionChangedHandler<VectorFeature>() {
-							@Override
-							public void onSelectionChanged(
-									SelectionChangedEvent<VectorFeature> event) {
-								setSelectedElement();
-							}
-						});
+		grid.getFeatureGrid().getSelectionModel()
+				.addSelectionChangedHandler(new SelectionChangedHandler<VectorFeature>() {
+					@Override
+					public void onSelectionChanged(SelectionChangedEvent<VectorFeature> event) {
+						setSelectedElement();
+					}
+				});
 
 		pageSize = new PageSizeComboBox("75px");
 		pageSize.addValueChangeHandler(new ValueChangeHandler<Integer>() {
@@ -253,10 +247,8 @@ public class LayerEditDialog extends Dialog implements ChangeSelectedLayerListen
 				boolean multiPage = event.getValue() < getLayerFeatures().length;
 				grid.setAutoCommit(multiPage);
 				if (multiPage) {
-					dialogBuilder.createWarning(
-							UIMessages.INSTANCE.lidWarningDialogHeadText(),
-							UIMessages.INSTANCE.lidWarningDialogBodytText())
-							.show();
+					dialogBuilder.createWarning(UIMessages.INSTANCE.lidWarningDialogHeadText(),
+							UIMessages.INSTANCE.lidWarningDialogBodytText()).show();
 				}
 			}
 		});
@@ -274,21 +266,17 @@ public class LayerEditDialog extends Dialog implements ChangeSelectedLayerListen
 		HorizontalLayoutContainer pagingContainer = new HorizontalLayoutContainer();
 		pagingContainer.setHeight(38);
 		pagingContainer.add(pagingToolBar, new HorizontalLayoutData(1, -1));
-		pagingContainer.add(
-				new FieldLabel(pageSize, "| "
-						+ UIMessages.INSTANCE.lidElementesPerPage()),
+		pagingContainer.add(new FieldLabel(pageSize, "| " + UIMessages.INSTANCE.lidElementesPerPage()),
 				new HorizontalLayoutData(-1, -1, new Margins(6, 0, 0, 5)));
 		gridContainer.add(pagingContainer, new VerticalLayoutData(1, -1));
 
-		layerInfoToolBar.setTools(LayerInfoToolBar.ZOOM_TOOL,
-				LayerInfoToolBar.SELECT_TOOL, LayerInfoToolBar.EXPORT_TOOL);
+		layerInfoToolBar.setTools(LayerInfoToolBar.ZOOM_TOOL, LayerInfoToolBar.SELECT_TOOL,
+				LayerInfoToolBar.EXPORT_TOOL);
 		layerInfoToolBar.setHeight(125);
 
 		HorizontalLayoutContainer hPanel = new HorizontalLayoutContainer();
-		hPanel.add(gridContainer, new HorizontalLayoutData(1, 1, new Margins(5,
-				0, 0, 5)));
-		hPanel.add(layerInfoToolBar, new HorizontalLayoutData(-1, -1,
-				new Margins(5, 0, 0, 0)));
+		hPanel.add(gridContainer, new HorizontalLayoutData(1, 1, new Margins(5, 0, 0, 5)));
+		hPanel.add(layerInfoToolBar, new HorizontalLayoutData(-1, -1, new Margins(5, 0, 0, 0)));
 
 		final ToolButton tButton = new ToolButton(ToolButton.QUESTION);
 		setHelpToolTip(tButton);
@@ -311,51 +299,55 @@ public class LayerEditDialog extends Dialog implements ChangeSelectedLayerListen
 	private void setHelpToolTip(final ToolButton tButton) {
 		final ToolTipConfig helpToolTip = new ToolTipConfig();
 		helpToolTip.setTitleText(HelpMessages.INSTANCE.help());
-		helpToolTip.setBodyHtml(HelpMessages.INSTANCE
-				.featureInfoDialogContent());
+		helpToolTip.setBodyHtml(HelpMessages.INSTANCE.featureInfoDialogContent());
 		helpToolTip.setCloseable(true);
 		tButton.setToolTipConfig(helpToolTip);
 	}
 
-//	private void addButtonHandlers() {
-//		this.getButton(PredefinedButton.OK).addSelectHandler(
-//				new SelectHandler() {
-//					@Override
-//					public void onSelect(final SelectEvent event) {
-//						grid.commitChanges();
-//					}
-//				});
-//
-//		this.getButton(PredefinedButton.CANCEL).addSelectHandler(
-//				new SelectHandler() {
-//					@Override
-//					public void onSelect(final SelectEvent event) {
-//						grid.rejectChanges();
-//					}
-//				});
-//	}
+	// private void addButtonHandlers() {
+	// this.getButton(PredefinedButton.OK).addSelectHandler(
+	// new SelectHandler() {
+	// @Override
+	// public void onSelect(final SelectEvent event) {
+	// grid.commitChanges();
+	// }
+	// });
+	//
+	// this.getButton(PredefinedButton.CANCEL).addSelectHandler(
+	// new SelectHandler() {
+	// @Override
+	// public void onSelect(final SelectEvent event) {
+	// grid.rejectChanges();
+	// }
+	// });
+	// }
 
 	private void setSelectedElement() {
-		List<VectorFeature> selectedElements = grid.getFeatureGrid()
-				.getSelectionModel().getSelectedItems();
+		List<VectorFeature> selectedElements = grid.getFeatureGrid().getSelectionModel().getSelectedItems();
 
-		if (selectedElements != null && !selectedElements.isEmpty()) {
-			for (FeatureTool tool : layerInfoToolBar.getTools()) {
+		for (FeatureTool tool : layerInfoToolBar.getTools()) {
 
-				tool.setSelectedLayer(selectedLayer);
+			tool.setSelectedLayer(selectedLayer);
 
-				if (selectedElements.size() > 1) {
-					tool.setSelectedFeatures(selectedElements);
-				} else {
-					tool.setSelectedFeature(selectedElements.get(0));
-				}
+			if (selectedElements != null && !selectedElements.isEmpty()) {
+
+				tool.setSelectedFeatures(selectedElements);
+			} else {
+				tool.setSelectedFeatures(Arrays.asList(selectedLayer.getFeatures()));
+
 			}
 		}
+
 	}
 
 	@Override
-	public void onChange(Vector layer) {		
-		setSelectedLayer((VectorLayer)layer);
+	public void onChange(Vector layer) {
+		setSelectedLayer((VectorLayer) layer);
+		for (FeatureTool tool : layerInfoToolBar.getTools()) {
+
+			tool.setSelectedLayer(selectedLayer);
+
+		}
 	}
 
 }

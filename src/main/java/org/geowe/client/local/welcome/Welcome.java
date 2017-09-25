@@ -30,6 +30,7 @@ import org.geowe.client.local.initializer.URLVectorLayerInitializer;
 import org.geowe.client.local.main.AnchorBuilder;
 import org.geowe.client.local.messages.UIMessages;
 import org.geowe.client.local.sgf.SGFLoginServiceProxy;
+import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.geowe.client.local.ui.KeyShortcutHandler;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.slf4j.Logger;
@@ -98,12 +99,6 @@ public class Welcome {
 
 			welcomeDialog.setFocusWidget(userNameField);
 
-			
-//			KeyShortcutHandler keyShortcut = new KeyShortcutHandler(okButton,
-//					KeyCodes.KEY_ENTER);
-//
-//			passwordField.addKeyDownHandler(keyShortcut);
-
 			passwordField.addKeyDownHandler(new KeyDownHandler() {
 
 				@Override
@@ -133,7 +128,7 @@ public class Welcome {
 		if (isEmptyCredential()) {
 			messageDialogBuilder.createInfo(
 					UIMessages.INSTANCE.warning(),
-					"Debe rellenar las credenciales correctamente")
+					UISgfMessages.INSTANCE.emptyCredentials())
 					.show();
 			return;
 		}

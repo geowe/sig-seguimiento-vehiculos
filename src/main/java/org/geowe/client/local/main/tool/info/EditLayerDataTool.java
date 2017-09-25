@@ -67,7 +67,7 @@ public class EditLayerDataTool extends LayerTool {
 
 	@PostConstruct
 	private void initialize() {
-		addFinishEditingListeners();
+		//addFinishEditingListeners();
 	}	
 	
 	/**

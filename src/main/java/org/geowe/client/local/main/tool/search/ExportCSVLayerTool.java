@@ -102,11 +102,7 @@ public class ExportCSVLayerTool extends LayerTool implements FeatureTool {
 		if (selectedFeatures != null) {
 			FileExporter.saveAs(exportCSV(selectedFeatures), layer.getName()
 					+ ".csv");
-		}
-		else {
-			FileExporter.saveAs(exportCSV(Arrays.asList(layer.getFeatures())), layer.getName()
-					+ ".csv");
-		}
+		}		
 	}
 
 	public String exportCSV(List<VectorFeature> selectedFeatures) {
