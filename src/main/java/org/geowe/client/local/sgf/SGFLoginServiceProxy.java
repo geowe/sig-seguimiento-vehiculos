@@ -39,15 +39,15 @@ public class SGFLoginServiceProxy {
 
 	public void login(String userName, String password) {
 		
-		/*if(true) {
-			welcome.hideProgressImage();
-			welcome.hideDialog();
-			SessionJSO session = JsonUtils.safeEval(SampleDataProvider.INSTANCE.session().getText());
-			vehicleTool.setSession(session);			
-			vehicleTool.onRelease();			
-			
-			return;
-		}*/
+//		if(true) {
+//			welcome.hideProgressImage();
+//			welcome.hideDialog();
+//			SessionJSO session = JsonUtils.safeEval(SampleDataProvider.INSTANCE.session().getText());
+//			vehicleTool.setSession(session);			
+//			vehicleTool.onRelease();			
+//			
+//			return;
+//		}
 		
 		
 		

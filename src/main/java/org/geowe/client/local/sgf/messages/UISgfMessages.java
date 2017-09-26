@@ -9,6 +9,8 @@ public interface UISgfMessages extends Messages {
 	
 	String authError();
 	
+	String emptyCredentials();
+	
 	String getIMEI();
 	
 	String notGPSFound();
@@ -61,6 +63,14 @@ public interface UISgfMessages extends Messages {
 	
 	String acummulatedDistanceColumn();
 	
+	String activeColumn();
+	
+	String nameColumn();
+	
+	String stoppedValue();
+	
+	String marchingValue();
+	
 	String drawRoute();
 	
 	String selectDate();
@@ -75,5 +85,8 @@ public interface UISgfMessages extends Messages {
 	
 	String companyVehicleList();
 	
+	String yesValue();
+	
 	String exit();
+	
 }

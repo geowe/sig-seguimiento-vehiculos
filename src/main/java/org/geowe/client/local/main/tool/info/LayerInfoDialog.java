@@ -27,6 +27,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.New;
 import javax.inject.Inject;
 
 import org.geowe.client.local.ImageProvider;
@@ -84,6 +85,7 @@ public class LayerInfoDialog extends Dialog implements DeleteFeatureListener,
 	@Inject
 	private JoinDataTool joinDataTool;
 	@Inject
+	//@New
 	private EditLayerDataTool editLayerDataTool;
 
 	private TextField layerNameField;
@@ -288,6 +290,6 @@ public class LayerInfoDialog extends Dialog implements DeleteFeatureListener,
 
 	@Override
 	public void onChange(Vector layer) {
-		setSelectedLayer((VectorLayer) layer);
+		setSelectedLayer((VectorLayer) layer);		
 	}
 }

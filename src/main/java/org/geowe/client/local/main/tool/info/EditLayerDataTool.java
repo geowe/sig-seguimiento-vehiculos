@@ -29,13 +29,19 @@ import javax.inject.Inject;
 import org.geowe.client.local.ImageProvider;
 import org.geowe.client.local.layermanager.LayerManagerWidget;
 import org.geowe.client.local.layermanager.tool.LayerTool;
+import org.geowe.client.local.layermanager.tool.export.exporter.FileExporter;
 import org.geowe.client.local.main.map.GeoMap;
 import org.geowe.client.local.messages.UIMessages;
+import org.geowe.client.local.ui.ProgressBarDialog;
+import org.jboss.errai.common.client.api.tasks.ClientTaskManager;
+import org.jboss.errai.common.client.util.TimeUnit;
 
 import com.google.gwt.resources.client.ImageResource;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
+import com.sencha.gxt.widget.core.client.event.ShowEvent;
+import com.sencha.gxt.widget.core.client.event.ShowEvent.ShowHandler;
 
 /**
  * Herramienta que muestra el diálogo de edición de datos alfanuméticos
@@ -48,6 +54,9 @@ import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 public class EditLayerDataTool extends LayerTool {
 	@Inject
 	private LayerEditDialog layerEditDialog;
+	@Inject
+	private ClientTaskManager taskManager;
+	private ProgressBarDialog autoMessageBox;
 	
 	@Inject
 	public EditLayerDataTool(LayerManagerWidget layeManagerWidget, GeoMap geoMap) {
@@ -67,7 +76,16 @@ public class EditLayerDataTool extends LayerTool {
 
 	@PostConstruct
 	private void initialize() {
-		addFinishEditingListeners();
+		//addFinishEditingListeners();
+		
+		layerEditDialog.addShowHandler(new ShowHandler() {
+
+			@Override
+			public void onShow(ShowEvent event) {
+				//autoMessageBox.hide();
+				layerEditDialog.setSelectedLayer(getSelectedVectorLayer());
+			}					
+		});			
 	}	
 	
 	/**
@@ -99,7 +117,32 @@ public class EditLayerDataTool extends LayerTool {
 	
 	@Override
 	public void onClick() {
-		layerEditDialog.setSelectedLayer(getSelectedVectorLayer());
-		layerEditDialog.show();		
+		autoMessageBox = new ProgressBarDialog(false,
+				UIMessages.INSTANCE.processing());
+		autoMessageBox.show();	
+		
+		taskManager.schedule(TimeUnit.SECONDS, 1, new Runnable() {
+
+			@Override
+			public void run() {
+				
+				layerEditDialog.show();		
+				autoMessageBox.hide();
+				
+								
+			}
+		});
+		
+//		taskManager.execute(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				
+//				layerEditDialog.show();		
+//				autoMessageBox.hide();
+//				
+//								
+//			}
+//		});						
 	}
 }
