@@ -11,5 +11,6 @@ public class VehicleJSO extends JavaScriptObject {
 	public final native String getLastRevisionDate() /*-{ return this.lastRevisionDate; }-*/; 
 	public final native String getComments() /*-{ return this.comments; }-*/;
 	public final native String getStatus() /*-{ return this.status; }-*/;
+	public final native String getName() /*-{ return this.name; }-*/;
 		
 }

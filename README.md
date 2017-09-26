@@ -1,11 +1,15 @@
 # sig-seguimiento-vehículos
 Adaptación del sig GeoWE para trabajar con información geográfica de vehículos.
 
-![Screenshot](https://github.com/geowe/sig-seguimiento-vehiculos/blob/master/screenshot.png)
+![Screenshot](https://github.com/jmmluna/sig-seguimiento-vehiculos/blob/master/sgf-car-icon-route.png)
+![Screenshot](https://github.com/jmmluna/sig-seguimiento-vehiculos/blob/master/sgf-line-report.png)
+![Screenshot](https://github.com/jmmluna/sig-seguimiento-vehiculos/blob/master/sgf-preview-report.png)
 
 Visualización de rutas de un vehículo a partir de la toma de datos GPS 
 
-![Screenshot](https://github.com/geowe/sig-seguimiento-vehiculos/blob/master/screenshot.jpg)
+![Screenshot](https://github.com/jmmluna/sig-seguimiento-vehiculos/blob/master/sgf-report.png)
+![Screenshot](https://github.com/jmmluna/sig-seguimiento-vehiculos/blob/master/sgf-vehicle-layer.png)
+![Screenshot](https://github.com/jmmluna/sig-seguimiento-vehiculos/blob/master/sgf-vehicle.png)
 
 ## License
 

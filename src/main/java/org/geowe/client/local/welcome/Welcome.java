@@ -30,12 +30,15 @@ import org.geowe.client.local.initializer.URLVectorLayerInitializer;
 import org.geowe.client.local.main.AnchorBuilder;
 import org.geowe.client.local.messages.UIMessages;
 import org.geowe.client.local.sgf.SGFLoginServiceProxy;
+import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.geowe.client.local.ui.KeyShortcutHandler;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.slf4j.Logger;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
@@ -93,46 +96,59 @@ public class Welcome {
 			welcomeDialog.setBodyStyleName("pad-text");
 			welcomeDialog.getBody().addClassName("pad-text");
 			welcomeDialog.add(getPanel(getHtml()));
+
+			welcomeDialog.setFocusWidget(userNameField);
+
+			passwordField.addKeyDownHandler(new KeyDownHandler() {
+
+				@Override
+				public void onKeyDown(KeyDownEvent event) {
+
+					if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+						doLogin();
+					}
+				}
+
+			});
 			
 			TextButton okButton = welcomeDialog.getButton(PredefinedButton.OK);
-			KeyShortcutHandler keyShortcut = new KeyShortcutHandler(okButton,
-					KeyCodes.KEY_ENTER);
-			
-			passwordField.addKeyDownHandler(keyShortcut);
-			
-			okButton.addSelectHandler(
-					new SelectHandler() {
-						@Override
-						public void onSelect(final SelectEvent event) {
-							if(isEmptyCredential()) {
-								messageDialogBuilder.createInfo(UIMessages.INSTANCE.warning(),
-										"Debe rellenar las credenciales correctamente").show();
-								return;
-							}
-							
-							uRLVectorLayerInitializer.createLayerFromURL();
-							progressImage.setVisible(true);
 
-							String userName = userNameField.getText();
-							String passwd = passwordField.getText();
-
-							sgfLoginServiceProxy.login(userName, passwd);
-						}
-					});
+			okButton.addSelectHandler(new SelectHandler() {
+				@Override
+				public void onSelect(final SelectEvent event) {
+					doLogin();
+				}
+			});
 		}
-		
-		
-		
+
 		welcomeDialog.show();
 	}
 	
-	
+	private void doLogin() {
+		if (isEmptyCredential()) {
+			messageDialogBuilder.createInfo(
+					UIMessages.INSTANCE.warning(),
+					UISgfMessages.INSTANCE.emptyCredentials())
+					.show();
+			return;
+		}
+
+		uRLVectorLayerInitializer.createLayerFromURL();
+		progressImage.setVisible(true);
+
+		String userName = userNameField.getText();
+		String passwd = passwordField.getText();
+
+		sgfLoginServiceProxy.login(userName, passwd);
+	}
+
 	private boolean isEmptyCredential() {
 		boolean isEmpty = false;
-		if(userNameField.getText().trim().isEmpty() || passwordField.getText().trim().isEmpty()) {
+		if (userNameField.getText().trim().isEmpty()
+				|| passwordField.getText().trim().isEmpty()) {
 			isEmpty = true;
 		}
-		
+
 		return isEmpty;
 	}
 
@@ -167,7 +183,7 @@ public class Welcome {
 		userNameField.setEmptyText(UIMessages.INSTANCE.gitHubUserNameField());
 		userNameField.setWidth(120);
 		userNameField.setAllowBlank(false);
-		userNameField.focus();
+		// userNameField.focus();
 		panel.add(userNameField);
 
 		passwordField = new PasswordField();

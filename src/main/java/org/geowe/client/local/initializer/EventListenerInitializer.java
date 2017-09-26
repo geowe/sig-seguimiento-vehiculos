@@ -31,6 +31,7 @@ import org.geowe.client.local.main.StatusPanelWidget;
 import org.geowe.client.local.main.map.GeoMap;
 import org.geowe.client.local.main.tool.edition.CopyElementTool;
 import org.geowe.client.local.main.tool.edition.UnionTool;
+import org.geowe.client.local.main.tool.info.LayerEditDialog;
 import org.geowe.client.local.main.tool.info.LayerInfoDialog;
 import org.geowe.client.local.main.tool.info.RasterInfoDialog;
 import org.geowe.client.local.main.tool.info.WmsGetInfoTool;
@@ -103,6 +104,8 @@ public class EventListenerInitializer {
 	private SaveProjectTool saveProjectTool;
 	@Inject
 	private PreviewWidget previewWidget;
+	@Inject	
+	private LayerEditDialog layerEditDialog;
 	
 
 	public void initialize() {
@@ -143,6 +146,8 @@ public class EventListenerInitializer {
 		layerManagerWidget.addChangeLayerListener(exportLayerTool);
 		layerManagerWidget.addChangeLayerListener(saveProjectTool);		
 		layerManagerWidget.addChangeLayerListener(previewWidget);
+		layerManagerWidget.addChangeLayerListener(layerEditDialog);
+		
 		
 	}
 	

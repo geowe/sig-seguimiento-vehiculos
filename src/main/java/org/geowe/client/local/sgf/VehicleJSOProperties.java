@@ -46,6 +46,8 @@ public interface VehicleJSOProperties extends PropertyAccess<VehicleJSO> {
 
 	ValueProvider<VehicleJSO, String> plate();
 	
+	ValueProvider<VehicleJSO, String> name();
+	
 	ValueProvider<VehicleJSO, String> kmsLeftForRevision();
 
 	ValueProvider<VehicleJSO, String> lastRevisionDate();

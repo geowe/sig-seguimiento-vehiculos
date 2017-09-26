@@ -115,14 +115,14 @@ public class VehicleTool extends TextButton {
 		loadVehicles(session.getToken(), company.getId());
 	}
 
-	// private void loadVehicles(String token, int companyId) {
-	// VehicleListResponseJSO vehicleListResponse =
-	// JsonUtils.safeEval(SampleDataProvider.INSTANCE.listVehicle().getText());
-	// List<VehicleJSO> vehicles =
-	// Arrays.asList(vehicleListResponse.getVehicleListEmbededJSO().getVehicles());
-	// vehicleDialog.setVehicle(vehicles);
-	// vehicleDialog.show();
-	// }
+//	 private void loadVehicles(String token, int companyId) {
+//	 VehicleListResponseJSO vehicleListResponse =
+//	 JsonUtils.safeEval(SampleDataProvider.INSTANCE.listVehicle().getText());
+//	 List<VehicleJSO> vehicles =
+//	 Arrays.asList(vehicleListResponse.getVehicleListEmbededJSO().getVehicles());
+//	 vehicleDialog.setVehicle(vehicles);
+//	 vehicleDialog.show();
+//	 }
 
 	private void loadVehicles(String token, int companyId) {
 		autoMessageBox = new ProgressBarDialog(false,

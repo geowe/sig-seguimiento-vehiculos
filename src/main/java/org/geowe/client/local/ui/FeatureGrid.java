@@ -26,8 +26,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.gwtopenmaps.openlayers.client.feature.VectorFeature;
 
+import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.ListStore;
@@ -35,10 +38,13 @@ import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
+import com.sencha.gxt.widget.core.client.grid.GridView;
+import com.sencha.gxt.widget.core.client.grid.filters.GridFilters;
+import com.sencha.gxt.widget.core.client.grid.filters.StringFilter;
 
 /**
- * Componente gráfico que representa una tabla con todos los datos
- * alfanuméricos (atributos) de un conjunto de VectorFeature 
+ * Componente gráfico que representa una tabla con todos los datos alfanuméricos
+ * (atributos) de un conjunto de VectorFeature
  * 
  * @author Atanasio Muñoz
  *
@@ -46,42 +52,43 @@ import com.sencha.gxt.widget.core.client.grid.Grid;
 public class FeatureGrid extends Grid<VectorFeature> {
 	public static final int DEFAULT_WIDTH = 430;
 	public static final int DEFAULT_HEIGHT = 200;
-	
+	private GridFilters<VectorFeature> filters = new GridFilters<VectorFeature>();
+
 	private boolean enableCellRender;
-	
+
 	public FeatureGrid(int width, int height) {
-		super(
-				new ListStore<VectorFeature>(
-						new ModelKeyProvider<VectorFeature> () {
-							@Override
-							public String getKey(VectorFeature item) {						
-								return item.getFeatureId();
-							}					
-						}),
-				
-				new ColumnModel<VectorFeature>(
-						new ArrayList<ColumnConfig<VectorFeature, ?>>())
-				);
-				
+		super(new ListStore<VectorFeature>(
+				new ModelKeyProvider<VectorFeature>() {
+					@Override
+					public String getKey(VectorFeature item) {
+						return item.getFeatureId();
+					}
+				}),
+
+		new ColumnModel<VectorFeature>(
+				new ArrayList<ColumnConfig<VectorFeature, ?>>())
+
+		);
+
 		this.setBorders(true);
 		this.setAllowTextSelection(true);
 		this.getView().setStripeRows(true);
-		this.getView().setColumnLines(true);		
-		this.setColumnReordering(true);					
+		this.getView().setColumnLines(true);
+		this.setColumnReordering(true);
 		this.setLoadMask(true);
-		
+
 		this.setWidth(width);
-		this.setHeight(height);	
-		
+		this.setHeight(height);
+
 		this.setEnableCellRender(false);
 	}
-	
+
 	public FeatureGrid() {
-		this(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+		this(DEFAULT_WIDTH, DEFAULT_HEIGHT);	
 	}
-	
+
 	public boolean isEnableCellRender() {
-		return enableCellRender;
+		return false;// enableCellRender;
 	}
 
 	public void setEnableCellRender(boolean enableCellRender) {
@@ -89,53 +96,57 @@ public class FeatureGrid extends Grid<VectorFeature> {
 	}
 
 	/**
-	 * Reconstruye la tabla completa en base a los atributos de las
-	 * features que se reciben como parámetro.
+	 * Reconstruye la tabla completa en base a los atributos de las features que
+	 * se reciben como parámetro.
+	 * 
 	 * @param features
 	 */
 	public void rebuild(List<VectorFeature> features) {
 		update(features);
-		this.reconfigure(this.getStore(), createColumnList(features));		
+		this.reconfigure(this.getStore(), createColumnList(features));
 	}
-	
+
 	/**
-	 * Reconstruye la tabla completa en base a los atributos de las
-	 * features que se reciben como parámetro.
+	 * Reconstruye la tabla completa en base a los atributos de las features que
+	 * se reciben como parámetro.
+	 * 
 	 * @param vectorFeatures
 	 */
 	public void rebuild(VectorFeature[] vectorFeatures) {
 		rebuild(Arrays.asList(vectorFeatures));
 	}
-	
+
 	/**
-	 * Actualiza los datos de la tabla con los datos de los atributos
-	 * de las features que se pasan como parámetro. El esquema de las
-	 * features debe coincidir con las columnas de la tabla
+	 * Actualiza los datos de la tabla con los datos de los atributos de las
+	 * features que se pasan como parámetro. El esquema de las features debe
+	 * coincidir con las columnas de la tabla
+	 * 
 	 * @param features
 	 */
 	public void update(List<VectorFeature> features) {
 		this.getStore().clear();
 		this.getStore().addAll(features);
 	}
-	
+
 	/**
-	 * Actualiza los datos de la tabla con los datos de los atributos
-	 * de las features que se pasan como parámetro. El esquema de las
-	 * features debe coincidir con las columnas de la tabla
+	 * Actualiza los datos de la tabla con los datos de los atributos de las
+	 * features que se pasan como parámetro. El esquema de las features debe
+	 * coincidir con las columnas de la tabla
+	 * 
 	 * @param vectorFeatures
 	 */
 	public void update(VectorFeature[] vectorFeatures) {
 		update(Arrays.asList(vectorFeatures));
 	}
-	
+
 	/**
-	 * Limpia todos los datos de la tabla manteniendo la definición
-	 * de las columnas
+	 * Limpia todos los datos de la tabla manteniendo la definición de las
+	 * columnas
 	 */
 	public void clear() {
 		this.getStore().clear();
 	}
-	
+
 	protected ColumnModel<VectorFeature> createColumnList(List<VectorFeature> features) {
 		List<ColumnConfig<VectorFeature, ?>> columns = new ArrayList<ColumnConfig<VectorFeature, ?>>();
 		
@@ -143,51 +154,81 @@ public class FeatureGrid extends Grid<VectorFeature> {
 			VectorFeature feature = features.get(0);
 
 			if(feature.getAttributes() != null) {
+				filters.initPlugin(this);
+				filters.setLocal(true);		
+				filters.removeAll();
 				for(String attributeName : feature.getAttributes().getAttributeNames()) {	
 					AttributeValueProvider attributeProvider = new AttributeValueProvider(attributeName);
 					
 					ColumnConfig<VectorFeature, String> attributeColumn = new ColumnConfig<VectorFeature, String>(
 							attributeProvider, 100, attributeName);
 					attributeColumn.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-					if(isEnableCellRender()) {
-						attributeColumn.setCell(new FeatureGridCellRenderer());
-					}					
+//					if(isEnableCellRender()) {
+//						attributeColumn.setCell(new FeatureGridCellRenderer());
+//					}					
 					
 					columns.add(attributeColumn);
+					
+					//ValueProvider<? super VectorFeature, Object> vp = grid.getEditableGrid().getColumnModel().getValueProvider(0);
+					//StringFilter<VectorFeature> plateFilter = new StringFilter<VectorFeature>(vp.getValue(object));
+//					if(UISgfMessages.INSTANCE.plateColumn().equals(attributeName)) {
+//						StringFilter<VectorFeature> plateFilter = new StringFilter<VectorFeature>(attributeProvider);															 
+//						filters.addFilter(plateFilter);					
+//					}
+					
+//					attributeColumn.setCell(new AbstractCell<String>() {
+//
+//						@Override
+//						public void render(
+//								com.google.gwt.cell.client.Cell.Context context,
+//								String value, SafeHtmlBuilder sb) {
+//							
+//							
+//						}
+//					});
+					
+					StringFilter<VectorFeature> plateFilter = new StringFilter<VectorFeature>(attributeProvider);															 
+					filters.addFilter(plateFilter);	
+					
+					
+					 
+					
+					
 				}
 			}					
 		}
 			
 		return new ColumnModel<VectorFeature>(columns);
 	}
-	
-	private class AttributeValueProvider implements ValueProvider<VectorFeature, String> {
 
-	    public String attributeName;
-	    
-	    public AttributeValueProvider(String attributeName) {
-	        this.attributeName = attributeName;
-	    }
+	private class AttributeValueProvider implements
+			ValueProvider<VectorFeature, String> {
 
-	    @Override
-	    public String getValue(VectorFeature feature) {
-	        if(feature.getAttributes().getAttributeAsString(attributeName) == null) {
-	            return "";
-	        } else {
-	            return "" + feature.getAttributes().getAttributeAsString(attributeName);
-	        }
-	    }
+		public String attributeName;
 
-	    @Override
-	    public void setValue(VectorFeature feature, String value) {
-	    	feature.getAttributes().setAttribute(attributeName, value);
-	    }
+		public AttributeValueProvider(String attributeName) {
+			this.attributeName = attributeName;
+		}
 
-	    @Override
-	    public String getPath() {
-	        return attributeName;
-	    }
+		@Override
+		public String getValue(VectorFeature feature) {
+			if (feature.getAttributes().getAttributeAsString(attributeName) == null) {
+				return "";
+			} else {
+				return ""
+						+ feature.getAttributes().getAttributeAsString(
+								attributeName);
+			}
+		}
+
+		@Override
+		public void setValue(VectorFeature feature, String value) {
+			feature.getAttributes().setAttribute(attributeName, value);
+		}
+
+		@Override
+		public String getPath() {
+			return attributeName;
+		}
 	}
 }
-
-
