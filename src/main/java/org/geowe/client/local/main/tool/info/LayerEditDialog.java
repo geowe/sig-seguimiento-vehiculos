@@ -346,7 +346,7 @@ public class LayerEditDialog extends Dialog implements ChangeSelectedLayerListen
 		for (FeatureTool tool : layerInfoToolBar.getTools()) {
 
 			tool.setSelectedLayer(selectedLayer);
-
+			tool.setSelectedFeatures(Arrays.asList(selectedLayer.getFeatures()));
 		}
 	}
 

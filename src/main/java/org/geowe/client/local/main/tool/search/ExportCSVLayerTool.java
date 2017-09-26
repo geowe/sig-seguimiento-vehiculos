@@ -38,7 +38,11 @@ import org.geowe.client.local.main.map.GeoMap;
 import org.geowe.client.local.main.tool.info.FeatureTool;
 import org.geowe.client.local.messages.UIMessages;
 import org.geowe.client.local.model.vector.VectorLayer;
+import org.geowe.client.local.ui.MessageDialogBuilder;
+import org.geowe.client.local.ui.ProgressBarDialog;
+import org.geowe.client.shared.rest.sgf.model.jso.VehicleJSO;
 import org.gwtopenmaps.openlayers.client.feature.VectorFeature;
+import org.jboss.errai.common.client.api.tasks.ClientTaskManager;
 
 import com.google.gwt.resources.client.ImageResource;
 
@@ -54,6 +58,9 @@ public class ExportCSVLayerTool extends LayerTool implements FeatureTool {
 	private VectorFeature selectedFeature;
 	private List<VectorFeature> selectedFeatures;
 	private VectorLayer layer;
+	@Inject
+	private ClientTaskManager taskManager;
+	private ProgressBarDialog autoMessageBox;
 
 	@Inject
 	public ExportCSVLayerTool(LayerManagerWidget layerManagerWidget,
@@ -99,10 +106,23 @@ public class ExportCSVLayerTool extends LayerTool implements FeatureTool {
 
 	@Override
 	public void onClick() {
-		if (selectedFeatures != null) {
-			FileExporter.saveAs(exportCSV(selectedFeatures), layer.getName()
-					+ ".csv");
-		}		
+		autoMessageBox = new ProgressBarDialog(false,
+				UIMessages.INSTANCE.processing());
+								
+		autoMessageBox.show();
+		taskManager.execute(new Runnable() {
+
+			@Override
+			public void run() {
+				if (selectedFeatures != null) {
+					FileExporter.saveAs(exportCSV(selectedFeatures), layer.getName()
+							+ ".csv");
+				}
+				
+				autoMessageBox.hide();
+			}
+		});
+		
 	}
 
 	public String exportCSV(List<VectorFeature> selectedFeatures) {

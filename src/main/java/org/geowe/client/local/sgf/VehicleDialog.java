@@ -27,11 +27,13 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.New;
 import javax.inject.Inject;
 
 import org.geowe.client.local.ImageProvider;
+import org.geowe.client.local.layermanager.LayerManagerWidget;
 import org.geowe.client.local.main.tool.info.EditLayerDataTool;
+import org.geowe.client.local.main.tool.layer.LayerManagerTool;
+import org.geowe.client.local.messages.UIMessages;
 import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.geowe.client.shared.rest.sgf.model.jso.CompanyJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.SessionJSO;
@@ -48,11 +50,16 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.core.client.Style.Side;
 import com.sencha.gxt.core.client.resources.ThemeStyles;
 import com.sencha.gxt.data.shared.ListStore;
+import com.sencha.gxt.fx.client.FxElement;
 import com.sencha.gxt.widget.core.client.Dialog;
+import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
+import com.sencha.gxt.widget.core.client.event.SelectEvent;
+import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
@@ -84,6 +91,8 @@ public class VehicleDialog extends Dialog {
 	private ListStore<VehicleJSO> vehicleStore;
 	private static final VehicleJSOProperties vehicleProps = GWT.create(VehicleJSOProperties.class);
 	private Grid<VehicleJSO> vehiculeGrid;
+	@Inject
+	private LayerManagerWidget layerMangerWidget;
 	
 	public VehicleDialog() {
 		super();
@@ -119,7 +128,7 @@ public class VehicleDialog extends Dialog {
 		hPanel.addStyleName(ThemeStyles.get().style().borderBottom());
 		hPanel.addStyleName(ThemeStyles.get().style().borderTop());
 		hPanel.add(getCompanyNamePanel());
-		hPanel.add(getCompanyCifPanel());
+		hPanel.add(getReportPanel());
 		
 		return hPanel;
 	}	
@@ -137,20 +146,42 @@ public class VehicleDialog extends Dialog {
 		
 	}
 
-	private VerticalPanel getCompanyCifPanel() {
-		VerticalPanel vPanel = new VerticalPanel();
-		vPanel.setSpacing(5);
+	private HorizontalPanel getReportPanel() {
+		HorizontalPanel hPanel = new HorizontalPanel();
+		hPanel.setSpacing(5);
 //		companyCifField = new TextField();
 //		companyCifField.setEnabled(false);
 //		companyCifField.setWidth(FIELD_WIDTH);
 //		vPanel.add(new Label(UISgfMessages.INSTANCE.cifLabel()));		
 //		vPanel.add(companyCifField);
-		vPanel.add(new Label(""));	
-		vPanel.add(editLayerDataTool);
+		hPanel.add(createLayerManagerButton());	
+		hPanel.add(editLayerDataTool);
 		
 		
-		return vPanel;
+		return hPanel;
 		
+	}
+	
+	private TextButton createLayerManagerButton() {		
+		TextButton showButton = new TextButton();
+		showButton.setIcon(ImageProvider.INSTANCE.layerIcon());
+		showButton.setText(UIMessages.INSTANCE.layerManagerToolText());
+		showButton.setTitle(UIMessages.INSTANCE.layerManagerToolTip());
+		showButton.addSelectHandler(new SelectHandler() {
+			@Override
+			public void onSelect(SelectEvent event) {
+				if (layerMangerWidget.asWidget().isVisible()) {
+					layerMangerWidget.asWidget().getElement().<FxElement> cast()
+							.fadeToggle();
+				} else {
+					layerMangerWidget.asWidget().getElement().<FxElement> cast()
+							.fadeToggle();
+					layerMangerWidget.asWidget().setVisible(true);
+				}
+			}
+		});
+
+		return showButton;
 	}
 
 	private HorizontalPanel createGridPanel() {
