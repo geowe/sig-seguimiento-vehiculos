@@ -40,6 +40,7 @@ import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.geowe.client.local.ui.ProgressBarDialog;
 import org.geowe.client.shared.rest.sgf.SGFCompanyService;
+import org.geowe.client.shared.rest.sgf.SGFRegisteredPointService;
 import org.geowe.client.shared.rest.sgf.SGFVehicleService;
 import org.geowe.client.shared.rest.sgf.model.jso.ActiveGPSJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.CompanyJSO;
@@ -144,46 +145,46 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 				for (VehicleJSO vehicle : vehicles) {
 					
 					//PointRegisterJSO point = getSamplePoint(vehicle);
-					getPoint(vehicle);
+					getRequestRegisteredPoint(session.getToken(),vehicle);
 				}
 				
 			}
 		});
 	}
 			
-	private void getPoint(final VehicleJSO vehicle) {
-		
-		autoMessageBox.setProgressStatusMessage(UISgfMessages.INSTANCE.getIMEI());
-		
-		RestClient.create(SGFVehicleService.class, SGFServiceInfo.getURL(),
-				new RemoteCallback<String>() {
-
-					@Override
-					public void callback(String activeGPSResponseJson) {	
-						
-						ActiveGPSJSO activeGPS = JsonUtils.safeEval(activeGPSResponseJson);
-						CompanyJSO company = session.getCompany();
-						getRequestRegisteredPoint(session.getToken(), company.getId(), activeGPS.getImei(), vehicle);						
-					}
-				},
-
-				new RestErrorCallback() {
-					
-					@Override
-					public boolean error(Request message, Throwable throwable) {
-						autoMessageBox.hide();
-						messageDialogBuilder.createInfo(UIMessages.INSTANCE.edtAlertDialogTitle(),  UISgfMessages.INSTANCE.notGPSFound()).show();
-						
-						return false;
-					}
-				}, Response.SC_OK).getActiveGPSDevice(session.getToken(), vehicle.getId());
-		
-	}
+//	private void getPoint(final VehicleJSO vehicle) {
+//		
+//		autoMessageBox.setProgressStatusMessage(UISgfMessages.INSTANCE.getIMEI());
+//		
+//		RestClient.create(SGFVehicleService.class, SGFServiceInfo.getURL(),
+//				new RemoteCallback<String>() {
+//
+//					@Override
+//					public void callback(String activeGPSResponseJson) {	
+//						
+//						ActiveGPSJSO activeGPS = JsonUtils.safeEval(activeGPSResponseJson);
+//						CompanyJSO company = session.getCompany();
+//						getRequestRegisteredPoint(session.getToken(), company.getId(), activeGPS.getImei(), vehicle);						
+//					}
+//				},
+//
+//				new RestErrorCallback() {
+//					
+//					@Override
+//					public boolean error(Request message, Throwable throwable) {
+//						autoMessageBox.hide();
+//						messageDialogBuilder.createInfo(UIMessages.INSTANCE.edtAlertDialogTitle(),  UISgfMessages.INSTANCE.notGPSFound()).show();
+//						
+//						return false;
+//					}
+//				}, Response.SC_OK).getActiveGPSDevice(session.getToken(), vehicle.getId());
+//		
+//	}
 				
-	private void getRequestRegisteredPoint(String token, int companyId, final String imei, final VehicleJSO vehicle) {
+	private void getRequestRegisteredPoint(String token, final VehicleJSO vehicle) {
 		autoMessageBox.setProgressStatusMessage(UISgfMessages.INSTANCE.getGPSData());
 		
-		RestClient.create(SGFCompanyService.class, SGFServiceInfo.getURL(),
+		RestClient.create(SGFRegisteredPointService.class, SGFServiceInfo.getURL(),
 				new RemoteCallback<String>() {
 
 					@Override
@@ -215,7 +216,7 @@ public class LastPointRegisterVehicleTool extends LayerTool implements
 						
 						return false;
 					}
-				}, Response.SC_OK).getLastRegisteredPoints(token, vehicle.getId(), imei, 1, "date,desc");
+				}, Response.SC_OK).getLastRegisteredPoints(token, vehicle.getId(),1,"date,desc");
 			
 	}
 		

@@ -42,10 +42,7 @@ import org.geowe.client.local.model.vector.VectorLayerFactory;
 import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.geowe.client.local.ui.ProgressBarDialog;
-import org.geowe.client.shared.rest.sgf.SGFCompanyService;
-import org.geowe.client.shared.rest.sgf.SGFVehicleService;
-import org.geowe.client.shared.rest.sgf.model.jso.ActiveGPSJSO;
-import org.geowe.client.shared.rest.sgf.model.jso.CompanyJSO;
+import org.geowe.client.shared.rest.sgf.SGFRegisteredPointService;
 import org.geowe.client.shared.rest.sgf.model.jso.DataJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.PointRegisterJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.PointRegisterListResponseJSO;
@@ -106,6 +103,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 	private static final String NAME = UISgfMessages.INSTANCE.nameColumn();
 	private static final String ACTIVE = UISgfMessages.INSTANCE.activeColumn();
 	private static final String STATUS = UISgfMessages.INSTANCE.statusColumn();
+	private static final int REGISTERED_POINTS_TO_LOAD = 500;
 	
 	private SessionJSO session;
 	private DateField field = new DateField();
@@ -174,7 +172,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 							public void run() {
 								for (VehicleJSO vehicle : vehicles) {									
 									//getSamplePoints(vehicle, startDate, endDate);
-									getPoints(vehicle, startDate, endDate);
+									getRequestRegisteredPoint(vehicle, startDate, endDate);
 
 								}
 							}
@@ -184,41 +182,41 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 		box.show();
 	}	
 	
-	private void getPoints(final VehicleJSO vehicle, final String startDate, final String endDate) {
-		
-		autoMessageBox.setProgressStatusMessage(UISgfMessages.INSTANCE.getIMEI());
-		
-		RestClient.create(SGFVehicleService.class,  SGFServiceInfo.getURL(),
-				new RemoteCallback<String>() {
-
-					@Override
-					public void callback(String activeGPSResponseJson) {	
-						
-						ActiveGPSJSO activeGPS = JsonUtils.safeEval(activeGPSResponseJson);
-						CompanyJSO company = session.getCompany();
-						getRequestRegisteredPoint(session.getToken(), company.getId(), activeGPS.getImei(), vehicle, startDate, endDate);
-						
-					}
-				},
-
-				new RestErrorCallback() {
-					
-					@Override
-					public boolean error(Request message, Throwable throwable) {
-						autoMessageBox.hide();
-						messageDialogBuilder.createInfo(UIMessages.INSTANCE.edtAlertDialogTitle(),  UISgfMessages.INSTANCE.notGPSFound()).show();
-						
-						return false;
-					}
-				}, Response.SC_OK).getActiveGPSDevice(session.getToken(), vehicle.getId());
-		
-	}
+//	private void getPoints(final VehicleJSO vehicle, final String startDate, final String endDate) {
+//		
+//		autoMessageBox.setProgressStatusMessage(UISgfMessages.INSTANCE.getIMEI());
+//		
+//		RestClient.create(SGFVehicleService.class,  SGFServiceInfo.getURL(),
+//				new RemoteCallback<String>() {
+//
+//					@Override
+//					public void callback(String activeGPSResponseJson) {	
+//						
+//						ActiveGPSJSO activeGPS = JsonUtils.safeEval(activeGPSResponseJson);
+//						CompanyJSO company = session.getCompany();
+//						getRequestRegisteredPoint(session.getToken(), company.getId(), activeGPS.getImei(), vehicle, startDate, endDate);
+//						
+//					}
+//				},
+//
+//				new RestErrorCallback() {
+//					
+//					@Override
+//					public boolean error(Request message, Throwable throwable) {
+//						autoMessageBox.hide();
+//						messageDialogBuilder.createInfo(UIMessages.INSTANCE.edtAlertDialogTitle(),  UISgfMessages.INSTANCE.notGPSFound()).show();
+//						
+//						return false;
+//					}
+//				}, Response.SC_OK).getActiveGPSDevice(session.getToken(), vehicle.getId());
+//		
+//	}
 	
 			
-	private void getRequestRegisteredPoint(String token, int companyId, final String imei, final VehicleJSO vehicle, final String startDate, final String endDate) {
+	private void getRequestRegisteredPoint(final VehicleJSO vehicle, final String startDate, final String endDate) {
 		autoMessageBox.setProgressStatusMessage(UISgfMessages.INSTANCE.getGPSData());
 		
-		RestClient.create(SGFCompanyService.class, SGFServiceInfo.getURL(),
+		RestClient.create(SGFRegisteredPointService.class, SGFServiceInfo.getURL(),
 				new RemoteCallback<String>() {
 
 					@Override
@@ -251,7 +249,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 						
 						return false;
 					}
-				}, Response.SC_OK).getRegisteredPoints(token, vehicle.getId(), imei, startDate, endDate, 500, "date,desc");			
+				}, Response.SC_OK).getRegisteredPoints(session.getToken(), vehicle.getId(), startDate, endDate, REGISTERED_POINTS_TO_LOAD, "date,desc");			
 	}
 	
 
