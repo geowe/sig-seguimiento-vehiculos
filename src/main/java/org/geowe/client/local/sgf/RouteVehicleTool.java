@@ -1,25 +1,4 @@
-/*
- * #%L
- * GeoWE Project
- * %%
- * Copyright (C) 2015 - 2016 GeoWE.org
- * %%
- * This file is part of GeoWE.org.
- * 
- * GeoWE is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * GeoWE is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with GeoWE.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
+
 package org.geowe.client.local.sgf;
 
 import java.math.BigDecimal;
@@ -42,11 +21,7 @@ import org.geowe.client.local.model.vector.VectorLayerFactory;
 import org.geowe.client.local.sgf.messages.UISgfMessages;
 import org.geowe.client.local.ui.MessageDialogBuilder;
 import org.geowe.client.local.ui.ProgressBarDialog;
-import org.geowe.client.shared.rest.sgf.SGFCompanyService;
-import org.geowe.client.shared.rest.sgf.SGFVehicleService;
-import org.geowe.client.shared.rest.sgf.model.jso.ActiveGPSJSO;
-import org.geowe.client.shared.rest.sgf.model.jso.CompanyJSO;
-import org.geowe.client.shared.rest.sgf.model.jso.DataJSO;
+import org.geowe.client.shared.rest.sgf.SGFRegisteredPointService;
 import org.geowe.client.shared.rest.sgf.model.jso.PointRegisterJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.PointRegisterListResponseJSO;
 import org.geowe.client.shared.rest.sgf.model.jso.SessionJSO;
@@ -87,13 +62,10 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 	private static final Projection DEFAULT_PROJECTION = new Projection(GeoMap.INTERNAL_EPSG);
 	private static final String PREFIX_LAYER = "r_";
 	private static final String GPS_DEFAULT_PROJECTION = "EPSG:4326";
-	//private static final String IMEI = UISgfMessages.INSTANCE.imeiColumn();
-	
 	private static final String PLATE = UISgfMessages.INSTANCE.plateColumn();
 	private static final String DATE = UISgfMessages.INSTANCE.dateColumn();
 	private static final String TIME = UISgfMessages.INSTANCE.timeColumn();
 	private static final String SPEED = UISgfMessages.INSTANCE.speedColumn();
-	private static final String DATA = UISgfMessages.INSTANCE.dataColumn();
 	private static final String POSITION = UISgfMessages.INSTANCE.positionColumn();
 	private static final String DISTANCE = UISgfMessages.INSTANCE.distanceColumn();
 	private static final String ACCUMULATED_DISTANCE = UISgfMessages.INSTANCE.acummulatedDistanceColumn();
@@ -104,8 +76,8 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 	private static final String POSTAL_CODE = UISgfMessages.INSTANCE.postalCodeColumn();
 	private static final String COUNTRY = UISgfMessages.INSTANCE.countryColumn();
 	private static final String NAME = UISgfMessages.INSTANCE.nameColumn();
-	private static final String ACTIVE = UISgfMessages.INSTANCE.activeColumn();
 	private static final String STATUS = UISgfMessages.INSTANCE.statusColumn();
+	private static final int REGISTERED_POINTS_TO_LOAD = 500;
 	
 	private SessionJSO session;
 	private DateField field = new DateField();
@@ -174,7 +146,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 							public void run() {
 								for (VehicleJSO vehicle : vehicles) {									
 									//getSamplePoints(vehicle, startDate, endDate);
-									getPoints(vehicle, startDate, endDate);
+									getRequestRegisteredPoint(vehicle, startDate, endDate);
 
 								}
 							}
@@ -184,41 +156,11 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 		box.show();
 	}	
 	
-	private void getPoints(final VehicleJSO vehicle, final String startDate, final String endDate) {
 		
-		autoMessageBox.setProgressStatusMessage(UISgfMessages.INSTANCE.getIMEI());
-		
-		RestClient.create(SGFVehicleService.class,  SGFServiceInfo.getURL(),
-				new RemoteCallback<String>() {
-
-					@Override
-					public void callback(String activeGPSResponseJson) {	
-						
-						ActiveGPSJSO activeGPS = JsonUtils.safeEval(activeGPSResponseJson);
-						CompanyJSO company = session.getCompany();
-						getRequestRegisteredPoint(session.getToken(), company.getId(), activeGPS.getImei(), vehicle, startDate, endDate);
-						
-					}
-				},
-
-				new RestErrorCallback() {
-					
-					@Override
-					public boolean error(Request message, Throwable throwable) {
-						autoMessageBox.hide();
-						messageDialogBuilder.createInfo(UIMessages.INSTANCE.edtAlertDialogTitle(),  UISgfMessages.INSTANCE.notGPSFound()).show();
-						
-						return false;
-					}
-				}, Response.SC_OK).getActiveGPSDevice(session.getToken(), vehicle.getId());
-		
-	}
-	
-			
-	private void getRequestRegisteredPoint(String token, int companyId, final String imei, final VehicleJSO vehicle, final String startDate, final String endDate) {
+	private void getRequestRegisteredPoint(final VehicleJSO vehicle, final String startDate, final String endDate) {
 		autoMessageBox.setProgressStatusMessage(UISgfMessages.INSTANCE.getGPSData());
 		
-		RestClient.create(SGFCompanyService.class, SGFServiceInfo.getURL(),
+		RestClient.create(SGFRegisteredPointService.class, SGFServiceInfo.getURL(),
 				new RemoteCallback<String>() {
 
 					@Override
@@ -251,7 +193,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 						
 						return false;
 					}
-				}, Response.SC_OK).getRegisteredPoints(token, vehicle.getId(), imei, startDate, endDate, 500, "date,desc");			
+				}, Response.SC_OK).getRegisteredPoints(session.getToken(), vehicle.getId(), startDate, endDate, REGISTERED_POINTS_TO_LOAD, "date,desc");			
 	}
 	
 
@@ -269,14 +211,12 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 		
 		VectorLayerConfig layerConfig = createVectorLayerConfig(vehicleJSO, dateToSearch);
 		VectorLayer routeLayer = createEmptyRouteLayer(layerConfig);
-		
 
 		WKT reader = new WKT();
 		List<Point> pointList = new ArrayList<Point>();
 
 		int totalSpeed = 0;
 		float accumulatedDistance = 0f;
-		//String imei = points.get(0).getImei();
 		String date = getDateAsString(points.get(0).getDate());
 
 		Point previusPoint = null;
@@ -305,20 +245,8 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 
 			f.getAttributes().setAttribute(SPEED, speed);
 			
-//			f.getAttributes().setAttribute(DATA,
-//					point.getDatos().replace(",", " "));
-			
-			DataJSO data = JsonUtils.safeEval(point.getDatos());
-			
-			String[]dataArray =  data.getData().split(",");			
-			String statusValue = dataArray[0];
-			String status = UISgfMessages.INSTANCE.stoppedValue(); // 1=0
-			
-			if("1=1".equals(statusValue)) {
-				status = UISgfMessages.INSTANCE.marchingValue();
-			}
-			
-			f.getAttributes().setAttribute(STATUS, status); //PARADA/MARCHA			
+			f.getAttributes().setAttribute(STATUS,
+					getPointStatus(point.getDatos())); // PARADA/MARCHA
 			f.getAttributes().setAttribute(POSITION, position);
 
 			g = f.getGeometry();
@@ -337,8 +265,6 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 				
 				accumulatedDistance = accumulatedDistance + setDistance(f, line);
 				f.getAttributes().setAttribute(ACCUMULATED_DISTANCE, getReoundedMeasure(accumulatedDistance, 2));
-//				f.getAttributes().setAttribute(DISTANCE,
-//						getReoundedMeasure(line.getGeodesicLength(DEFAULT_PROJECTION), 2));
 			}
 			
 			f.getAttributes().setAttribute(STREET, point.getStreet());
@@ -350,7 +276,6 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 			
 			previusPoint = currentPoint;
 			totalSpeed = totalSpeed + speed;
-
 		}
 
 		LineString line = new LineString(pointList.toArray(new Point[] {}));
@@ -364,10 +289,7 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 		lineFeature.getAttributes().setAttribute(SPEED,
 				(totalSpeed / points.size()));
 		
-		
 		setDistance(lineFeature, line);
-//		lineFeature.getAttributes().setAttribute(DISTANCE,
-//				getReoundedMeasure(line.getGeodesicLength(DEFAULT_PROJECTION), 2));
 
 		String color = routeLayer.getVectorStyle().getFill().getNormalColor();
 		routeLayer.getVectorStyle().getLine().setNormalColor(color);
@@ -380,6 +302,16 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 		geoMap.getMap().zoomToExtent(routeLayer.getDataExtent());
 	}
 	
+	private String getPointStatus(String datos) {
+		String status = "undefined";
+		if (datos.contains("1=1")) {
+			status = UISgfMessages.INSTANCE.marchingValue();
+		} else if (datos.contains("1=0")) {
+			status = UISgfMessages.INSTANCE.stoppedValue();
+		}
+		return status;
+	}
+
 	private float setDistance(VectorFeature feature, LineString line) {
 		float distance = getReoundedMeasure(line.getGeodesicLength(DEFAULT_PROJECTION), 2);
 		feature.getAttributes().setAttribute(DISTANCE, distance);
@@ -400,7 +332,6 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 		VectorLayer routeLayer = null;
 
 		try {
-
 			routeLayer = VectorLayerFactory.createEmptyVectorLayer(layerConfig);
 			routeLayer.addAttribute(NAME, false);
 			routeLayer.addAttribute(PLATE, false);
@@ -417,12 +348,6 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 			routeLayer.addAttribute(DISTANCE, false);
 			routeLayer.addAttribute(ACCUMULATED_DISTANCE, false);
 			routeLayer.addAttribute(POSITION, false);
-			//routeLayer.addAttribute(ACTIVE, false);			
-			
-			//routeLayer.addAttribute(DATA, false);
-			
-			//NOMBRE-MATRÍCULA-ESTADO(PARADO/MARCHA)-FECHA-HORA-CALLE-Nº-LOCALIDAD-PROVINCIA-CP-PAIS-VELOCIDAD-DIST(m)-DIST ACU(m)-POSICIÓN-ACTIVO(SI/NO)
-			
 
 		} catch (Exception e) {
 			messageDialogBuilder.createInfo("Error", e.getMessage()).show();
@@ -457,9 +382,6 @@ public class RouteVehicleTool extends LayerTool implements VehicleButtonTool {
 		}
 		
 		createRouteLayer(vehicleJSO, startDate, points);
-		
-		
-		
 	}
 
 	public String getDateAsString(int[] date) {
